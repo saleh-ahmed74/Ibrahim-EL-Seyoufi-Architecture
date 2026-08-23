@@ -36,7 +36,7 @@ class SiteSettingsTable
                     ->searchable(),
                 TextColumn::make('linkedin_url')
                     ->searchable(),
-                TextColumn::make('behance_url')
+                TextColumn::make('youtube_url')
                     ->searchable(),
                 TextColumn::make('pinterest_url')
                     ->searchable(),

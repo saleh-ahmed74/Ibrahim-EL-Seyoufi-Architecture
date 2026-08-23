@@ -30,7 +30,7 @@ export type Settings = {
     instagram_url?: string;
     facebook_url?: string;
     linkedin_url?: string;
-    behance_url?: string;
+    youtube_url?: string;
     pinterest_url?: string;
     meta_title?: string;
     meta_description?: string

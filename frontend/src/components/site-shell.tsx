@@ -18,7 +18,7 @@ type SocialLinks = {
     instagram_url?: string;
     facebook_url?: string;
     linkedin_url?: string;
-    behance_url?: string;
+    youtube_url?: string;
     pinterest_url?: string;
 };
 
@@ -57,7 +57,7 @@ export default function SiteShell({
               { key: 'instagram', url: social.instagram_url, label: 'Instagram' },
               { key: 'facebook', url: social.facebook_url, label: 'Facebook' },
               { key: 'linkedin', url: social.linkedin_url, label: 'LinkedIn' },
-              { key: 'behance', url: social.behance_url, label: 'Behance' },
+              { key: 'youtube', url: social.youtube_url, label: 'youtube' },
               { key: 'pinterest', url: social.pinterest_url, label: 'Pinterest' },
           ].filter((s) => s.url)
         : [];

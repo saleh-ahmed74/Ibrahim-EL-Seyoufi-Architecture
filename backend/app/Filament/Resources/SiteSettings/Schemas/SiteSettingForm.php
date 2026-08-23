@@ -46,7 +46,7 @@ class SiteSettingForm
                     ->url(),
                 TextInput::make('linkedin_url')
                     ->url(),
-                TextInput::make('behance_url')
+                TextInput::make('youtube_url')
                     ->url(),
                 TextInput::make('pinterest_url')
                     ->url(),

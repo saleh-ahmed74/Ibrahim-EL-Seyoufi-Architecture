@@ -29,7 +29,7 @@ return new class extends Migration {
             $table->string('instagram_url')->nullable();
             $table->string('facebook_url')->nullable();
             $table->string('linkedin_url')->nullable();
-            $table->string('behance_url')->nullable();
+            $table->string('youtube_url')->nullable();
             $table->string('pinterest_url')->nullable();
             $table->string('profile_image')->nullable();
             $table->string('hero_image')->nullable();
