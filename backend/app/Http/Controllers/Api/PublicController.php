@@ -60,4 +60,43 @@ class PublicController extends Controller
             'data' => SiteSetting::firstOrFail()
         ];
     }
+
+    // public function filterByCategory(Request $request)
+    // {
+    //     $categorySlug = $request->input('category_slug');
+
+    //     // Validate the category slug
+    //     if (!$categorySlug) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Category slug is required.'
+    //         ], 400);
+    //     }
+
+    //     // Fetch the category by slug
+    //     $category = Category::where('slug', $categorySlug)->first();
+
+    //     if (!$category) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Category not found.'
+    //         ], 404);
+    //     }
+
+    //     // Fetch projects associated with the category
+    //     $projects = Project::with(['category', 'images', 'coverImage'])
+    //         ->whereHas('category', function ($query) use ($categorySlug) {
+    //             $query->where('slug', $categorySlug);
+    //         })
+    //         ->latest()
+    //         ->get()
+    //         ->map(fn($p) => $this->p($p));
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => $projects
+    //     ]);
+    // }
+
+
 }

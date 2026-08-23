@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
+
 const text = {
     en: {
         home: 'Home', projects: 'Projects', about: 'About',
@@ -12,12 +13,27 @@ const text = {
         theme: 'المظهر', language: 'English'
     }
 };
-export default function SiteShell({ children, name = 'Architecture' }:
-    { children: ReactNode; name?: string }) {
+
+type SocialLinks = {
+    instagram_url?: string;
+    facebook_url?: string;
+    linkedin_url?: string;
+    behance_url?: string;
+    pinterest_url?: string;
+};
+
+export default function SiteShell({
+    children,
+    name = 'Architecture',
+    social,
+}: {
+    children: ReactNode;
+    name?: string;
+    social?: SocialLinks;
+}) {
     const [lang, setLang] = useState<'en' | 'ar'>('en');
     const [dark, setDark] = useState(false);
 
-    // Initialize from localStorage on mount
     useEffect(() => {
         try {
             const l = localStorage.getItem('site_lang');
@@ -34,10 +50,27 @@ export default function SiteShell({ children, name = 'Architecture' }:
         try { localStorage.setItem('site_lang', lang); localStorage.setItem('site_theme', dark ? 'dark' : 'light'); } catch (e) { }
     }, [lang, dark]);
 
-    const t = text[lang]; return <>
-        <header className="nav"><Link href="/" className="wordmark">{name}</Link><nav>
+    const t = text[lang];
+
+    const socialLinks = social
+        ? [
+              { key: 'instagram', url: social.instagram_url, label: 'Instagram' },
+              { key: 'facebook', url: social.facebook_url, label: 'Facebook' },
+              { key: 'linkedin', url: social.linkedin_url, label: 'LinkedIn' },
+              { key: 'behance', url: social.behance_url, label: 'Behance' },
+              { key: 'pinterest', url: social.pinterest_url, label: 'Pinterest' },
+          ].filter((s) => s.url)
+        : [];
+
+    return <>
+        <header className="nav nav-sticky"><Link href="/" className="wordmark">{name}</Link><nav>
             <Link href="/">{t.home}</Link><Link href="/projects">{t.projects}</Link>
             <Link href="/about">{t.about}</Link></nav><div className="nav-actions">
+                {socialLinks.map((s) => (
+                    <a key={s.key} href={s.url} target="_blank" rel="noopener noreferrer">
+                        {s.label}
+                    </a>
+                ))}
                 <button onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}>
                     {t.language}</button>
                 <button aria-label={t.theme} onClick={() => setDark(!dark)}>

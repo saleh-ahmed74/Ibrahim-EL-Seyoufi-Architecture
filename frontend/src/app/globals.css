@@ -164,11 +164,65 @@ h2 {
     color: var(--muted)
 }
 
-.hero-image {
+.hero-slideshow {
+    position: relative;
     width: 100%;
     height: min(64vh, 720px);
+    overflow: hidden;
+}
+
+.hero-slideshow .slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    filter: saturate(.75)
+    filter: saturate(.75);
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
+
+.hero-slideshow .slide.active {
+    opacity: 1;
+}
+
+.slideshow-controls {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 .75rem;
+    pointer-events: none;
+}
+
+.slideshow-controls button {
+    pointer-events: auto;
+    width: 2.4rem;
+    height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(244, 243, 239, .85);
+    color: var(--ink, #181817);
+    font-size: 1.3rem;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity .25s ease;
+}
+
+.hero-slideshow:hover .slideshow-controls button {
+    opacity: .9;
+}
+
+.slideshow-controls button:hover {
+    opacity: 1 !important;
+}
+
+@media (max-width: 700px) {
+    .slideshow-controls button {
+        opacity: .7;
+    }
 }
 
 .cta-row {
@@ -359,10 +413,10 @@ h2 {
         min-height: 0
     }
 
-    .hero-image {
+    /* .hero-image {
         height: 56vh;
         order: -1
-    }
+    } */
 
     .projects-grid {
         grid-template-columns: 1fr 1fr;
@@ -389,4 +443,239 @@ h2 {
     h1 {
         letter-spacing: -.06em
     }
+   .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    margin-bottom: 2.2rem;
+}
+.filter-bar > .eyebrow {
+    margin: 0;
+    color: var(--muted) !important;
+}
+
+.filter-select {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    padding: 0 1.2rem .3rem 0;
+}
+
+.filter-select select {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--ink) !important;
+    font-family: 'DM Mono', monospace;
+    font-size: .8rem;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.filter-select select::-ms-expand {
+    display: none;
+}
+
+.filter-select svg {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    margin-bottom: 2.2rem;
+}
+
+.filter-dropdown {
+    position: relative;
+}
+
+.filter-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .55rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: 'DM Mono', monospace;
+    font-size: .78rem;
+    letter-spacing: .01em;
+    color: var(--ink);
+    background: var(--bg);
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.filter-trigger:hover {
+    border-color: var(--ink);
+}
+
+.filter-trigger .chevron {
+    color: var(--muted);
+    transition: transform .25s ease, color .2s ease;
+}
+
+.filter-trigger .chevron.open {
+    transform: rotate(180deg);
+    color: var(--ink);
+}
+
+.filter-menu {
+    position: absolute;
+    top: calc(100% + .5rem);
+    left: 0;
+    min-width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: .4rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .08);
+    z-index: 30;
+    animation: filter-pop .18s ease;
+}
+
+@keyframes filter-pop {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.filter-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: .5rem .75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: .78rem;
+    color: var(--muted);
+    white-space: nowrap;
+    border-radius: 8px;
+    transition: background .15s ease, color .15s ease;
+}
+
+.filter-option:hover {
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.filter-option.active {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+[data-theme='dark'] .filter-menu {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .35);
+}
+
+.project-gallery {
+    max-width: 60rem;
+    margin: 0 auto 5rem;
+}
+
+.gallery-main {
+    position: relative;
+    background: var(--surface);
+    aspect-ratio: 16/10;
+    overflow: hidden;
+}
+
+.gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.6rem;
+    height: 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 1.4rem;
+    line-height: 1;
+    opacity: .85;
+    transition: opacity .2s ease;
+}
+
+.gallery-nav:hover {
+    opacity: 1;
+}
+
+.gallery-nav.prev { left: 1rem; }
+.gallery-nav.next { right: 1rem; }
+
+.gallery-thumbs {
+    display: flex;
+    gap: .6rem;
+    margin-top: .75rem;
+    overflow-x: auto;
+    padding-bottom: .25rem;
+}
+
+.thumb {
+    flex: 0 0 auto;
+    width: 4.5rem;
+    height: 3.4rem;
+    padding: 0;
+    background: var(--surface);
+    overflow: hidden;
+    opacity: .55;
+    border-bottom: 2px solid transparent;
+    transition: opacity .2s ease, border-color .2s ease;
+}
+
+.thumb:hover {
+    opacity: .85;
+}
+
+.thumb.active {
+    opacity: 1;
+    border-color: var(--ink);
+}
+
+.thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 700px) {
+    .gallery-main { aspect-ratio: 4/3; }
+    .thumb { width: 3.6rem; height: 2.8rem; }
+}
+.nav-actions a {
+    font-size: .8rem;
+    color: var(--muted);
+    transition: color .2s ease;
+}
+
+.nav-actions a:hover {
+    color: var(--ink);
+}
+.nav-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
 }

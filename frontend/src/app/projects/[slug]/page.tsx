@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import SiteShell from '@/components/site-shell';
 import { asset, getProject, getSettings } from '@/lib/api';
+import ProjectGallery from '@/components/project-gallery';
+
 export const dynamic = 'force-dynamic';
 export default async function ProjectDetails({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params; try {

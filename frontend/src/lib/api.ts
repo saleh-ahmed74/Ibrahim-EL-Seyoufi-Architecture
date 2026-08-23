@@ -38,7 +38,8 @@ export type Settings = {
 const api = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 async function get<T>(path: string): Promise<T> { const res = await fetch(`${api}${path}`, { next: { revalidate: 60 } }); if (!res.ok) throw new Error('API request failed'); const json = await res.json(); return json.data; }
 export const getSettings = () => get<Settings>('/site-settings');
-export const getProjects = () => get<Project[]>('/projects');
+export const getProjects = (category?: string) =>
+    get<Project[]>(`/projects${category ? `?category=${encodeURIComponent(category)}` : ''}`);
 export const getProject = (slug: string) => get<Project>(`/projects/${slug}`);
 export const getCategories = () => get<{ name: string; slug: string }[]>('/categories');
 export const asset = (path?: string | null) => {
