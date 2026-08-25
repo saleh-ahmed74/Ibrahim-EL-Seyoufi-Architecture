@@ -8,6 +8,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Schemas\Schema;
+use App\Support\ImageCompressor;
 
 class ProjectForm
 {
@@ -30,7 +31,14 @@ class ProjectForm
                     ->numeric()
                     ->default(0),
                 Repeater::make('images')->relationship()->schema([
-                    FileUpload::make('image_path')->disk('public')->directory('projects')->image()->required(),
+                    FileUpload::make('image_path')
+                        ->disk('public')
+                        ->directory('projects')
+                        ->image()
+                        ->required()
+                        ->saveUploadedFileUsing(
+                            fn($file) => ImageCompressor::store($file, 'public', 'projects', 1920, 75)
+                        ),
                     TextInput::make('alt_text'),
                     TextInput::make('sort_order')->numeric()->default(0),
                     \Filament\Forms\Components\Toggle::make('is_cover')->default(false),

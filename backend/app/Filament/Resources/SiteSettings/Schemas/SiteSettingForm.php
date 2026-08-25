@@ -6,6 +6,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use App\Support\ImageCompressor;
 
 class SiteSettingForm
 {
@@ -52,10 +53,23 @@ class SiteSettingForm
                     ->url(),
                 FileUpload::make('profile_image')
                     ->image()
-                    ->disk('public'),
+                    ->imageResizeMode('cover')
+                    ->imageCropAspectRatio('1:1')
+                    ->imageResizeTargetWidth('800')
+                    ->imageResizeTargetHeight('800')
+                    ->disk('public')
+                    ->saveUploadedFileUsing(
+                        fn($file) => ImageCompressor::store($file, 'public', null, 800, 75)
+                    ),
                 FileUpload::make('hero_image')
                     ->image()
-                    ->disk('public'),
+                    ->imageResizeMode('cover')
+                    ->imageResizeTargetWidth('1920')
+                    ->imageResizeTargetHeight('1080')
+                    ->disk('public')
+                    ->saveUploadedFileUsing(
+                        fn($file) => ImageCompressor::store($file, 'public', null, 1920, 75)
+                    ),
                 TextInput::make('meta_title'),
                 Textarea::make('meta_description')
                     ->columnSpanFull(),

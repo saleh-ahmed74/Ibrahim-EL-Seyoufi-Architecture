@@ -19,14 +19,11 @@ type SocialLinks = {
 };
 
 function getInitialLang(): 'en' | 'ar' {
-    if (typeof window === 'undefined') return 'en';
-    const l = localStorage.getItem('site_lang');
-    return l === 'ar' ? 'ar' : 'en';
+    return 'en';
 }
 
 function getInitialDark(): boolean {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem('site_theme') === 'dark';
+    return false;
 }
 
 export default function SiteShell({
@@ -43,10 +40,17 @@ export default function SiteShell({
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        try {
+            const savedLang = localStorage.getItem('site_lang');
+            const savedTheme = localStorage.getItem('site_theme');
+            if (savedLang === 'ar') setLang('ar');
+            if (savedTheme === 'dark') setDark(true);
+        } catch (e) {}
         setMounted(true);
     }, []);
 
     useEffect(() => {
+        if (!mounted) return;
         document.documentElement.lang = lang;
         document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
@@ -54,7 +58,7 @@ export default function SiteShell({
             localStorage.setItem('site_lang', lang);
             localStorage.setItem('site_theme', dark ? 'dark' : 'light');
         } catch (e) {}
-    }, [lang, dark]);
+    }, [lang, dark, mounted]);
 
     const t = text[lang];
 
@@ -91,8 +95,8 @@ export default function SiteShell({
                         </a>
                     ))}
                     <button onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}>{t.language}</button>
-                    <button aria-label={t.theme} onClick={() => setDark(!dark)}>
-                        {dark ? '☀' : '◐'}
+                    <button aria-label={t.theme} onClick={() => setDark(!dark)} suppressHydrationWarning>
+                        {mounted && dark ? '☀' : '◐'}
                     </button>
                 </div>
             </header>
