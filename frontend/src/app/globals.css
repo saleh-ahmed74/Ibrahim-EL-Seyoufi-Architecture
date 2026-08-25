@@ -661,21 +661,36 @@ h2 {
     .gallery-main { aspect-ratio: 4/3; }
     .thumb { width: 3.6rem; height: 2.8rem; }
 }
-.nav-actions a {
-    font-size: .8rem;
-    color: var(--muted);
-    transition: color .2s ease;
-}
-
-.nav-actions a:hover {
-    color: var(--ink);
-}
 .nav-sticky {
     position: sticky;
     top: 0;
     z-index: 50;
     background: var(--bg);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+}
+
+.nav-actions a {
+    display: inline-flex;
+    align-items: center;
+    color: var(--muted);
+    transition: color .2s ease;
+}
+.nav-actions a:hover {
+    color: var(--ink);
+}
+
+.whatsapp-fab {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 60;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: #25D366;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,.25);
 }
 }

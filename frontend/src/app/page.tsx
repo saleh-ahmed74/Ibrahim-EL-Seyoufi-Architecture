@@ -59,7 +59,7 @@ export default async function Home({
                     <Link href="/projects">All projects →</Link>
                 </div>
 
-                <CategorySelect categories={categories} current={category ?? ''} basePath="/" />
+               <CategorySelect categories={categories} current={category ?? ''} basePath="/projects" />
 
                 <div className="projects-grid">
                     {projects.slice(0, 6).map((p) => (
