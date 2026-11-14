@@ -4,12 +4,12 @@
     <p class="auth-intro">Sign in to your portfolio account.</p>
     <form class="auth-form" wire:submit="login">
         <label for="login-email">Email address</label>
-        <input id="login-email" type="email" wire:model="email" autocomplete="username" required>
-        @error('email')<p class="field-error">{{ $message }}</p>@enderror
+        <input id="login-email" type="email" wire:model="email" autocomplete="username" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" @class(['auth-input-error' => $errors->has('email')]) required>
+        @error('email')<p class="field-error" role="alert">{{ $message }}</p>@enderror
 
         <label for="login-password">Password</label>
-        <input id="login-password" type="password" wire:model="password" autocomplete="current-password" required>
-        @error('password')<p class="field-error">{{ $message }}</p>@enderror
+        <input id="login-password" type="password" wire:model="password" autocomplete="current-password" aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}" @class(['auth-input-error' => $errors->has('password')]) required>
+        @error('password')<p class="field-error" role="alert">{{ $message }}</p>@enderror
 
         <a class="auth-secondary-link" href="{{ route('password.request') }}">Forgot password?</a>
         <button class="button" type="submit" wire:loading.attr="disabled">Sign in</button>

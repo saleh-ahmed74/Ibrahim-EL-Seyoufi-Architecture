@@ -36,7 +36,7 @@ class PublicContent
     {
         return $this->remember(
             'categories',
-            fn () => Category::query()->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(),
+            fn () => Category::query()->where('is_active', true)->withCount(['projects as main_projects_count' => fn ($query) => $query->whereNull('parent_id')])->with(['projects' => fn ($query) => $query->rootProjects()->with(['coverImage', 'images'])->orderBy('sort_order')])->orderBy('sort_order')->orderBy('name')->get(),
             new Collection(),
         );
     }
@@ -79,7 +79,7 @@ class PublicContent
                 ->where(fn ($query) => $query->whereNull('parent_id')->orWhereHas('parent'))
                 ->with([
                     'category',
-                    'parent',
+                    'parent.category',
                     'images',
                     'coverImage',
                     'children.category',

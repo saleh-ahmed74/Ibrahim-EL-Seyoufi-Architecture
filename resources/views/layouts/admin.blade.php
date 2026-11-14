@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" data-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,7 +25,7 @@
                 <span class="admin-sidebar-user">{{ auth()->user()->name }}</span>
                 <a href="{{ route('account.password') }}">Change password</a>
                 <a href="{{ route('home') }}" target="_blank" rel="noopener noreferrer">View public website ↗</a>
-                <form method="post" action="{{ route('admin.logout') }}">@csrf<button type="submit">Sign out</button></form>
+                <form method="post" action="{{ route('admin.logout') }}">@csrf<button class="admin-sign-out" type="submit">Sign out</button></form>
             </div>
         </aside>
         <button class="admin-sidebar-scrim" type="button" aria-label="Close administration menu" x-show="menuOpen" x-on:click="menuOpen = false" x-cloak></button>

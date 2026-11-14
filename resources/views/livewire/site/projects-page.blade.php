@@ -3,17 +3,7 @@
         <div><span class="eyebrow">Portfolio</span><h1>Projects</h1><p>A selection of spatial, residential and cultural work.</p></div>
     </div>
 
-    @if ($categories->isNotEmpty())
-        <div class="filter-bar">
-            <label class="eyebrow" for="projects-category">Filter</label>
-            <select id="projects-category" wire:model.live="category" aria-label="Filter projects by category">
-                <option value="">All work</option>
-                @foreach ($categories as $categoryOption)
-                    <option value="{{ $categoryOption->slug }}">{{ $categoryOption->name }}</option>
-                @endforeach
-            </select>
-        </div>
-    @endif
+    @include('livewire.site.category-filter', ['categories' => $categories, 'projects' => $projects, 'settings' => $settings, 'selectedCategory' => $category])
 
     <div class="projects-grid">
         @forelse ($projects as $project)

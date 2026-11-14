@@ -2,7 +2,7 @@
 
 **Product:** Ibrahim EL-Seyoufi Architecture Portfolio
 **Status:** Implementation brief
-**Updated:** 2026-11-14
+**Updated:** 2026-11-15
 
 ## 1. Product overview
 
@@ -16,7 +16,7 @@ Goals:
 
 - Serve the public site and admin from Laravel and Livewire.
 - Keep MySQL as the source of truth and retain existing data.
-- Keep the existing visual identity, project pages, category filtering, About page, social links, themes, and contact links.
+- Keep the existing visual identity, project pages, About page, social links, and contact details; make the dark theme the default and keep all controls easy to find.
 - Support main projects containing internal projects.
 - Let an administrator upload the logo and homepage image.
 - Improve behavior during slow or interrupted internet connections.
@@ -30,10 +30,10 @@ Goals:
 
 ### Public website
 
-- Home shows the uploaded logo at the upper left and navigation at the upper right.
+- A slim, uploaded logo stays centered in a sticky header. The navigation menu sits on the left beside the studio name and contains page links, account access, language, and color mode.
 - The home image occupies about two thirds of a mobile viewport, with the portfolio introduction overlaid.
-- The home page lists main projects and supports category filtering.
-- A main project may contain internal projects. Its detail page automatically rotates through internal-project cover images every second, with manual controls and a pause option.
+- The home page lists main projects and filters them with a horizontal row of clickable category image tiles. Each category can have its own cover image.
+- A main project may contain any number of internal projects. Its detail page uses a full-bleed gallery behind the title and introduction, then presents image-led subproject cards with consistent image ratios. The gallery advances every second, with manual controls and a pause option.
 - A project without internal projects continues to show its own image gallery, which also advances every second.
 - Existing project, category, biography, social, contact, language, and theme content remains available.
 
@@ -42,8 +42,8 @@ Goals:
 - Administrator sign-in is available at /admin/login. Public account sign-in, sign-up, email verification, password recovery, and password change are available from the public navigation.
 - Public sign-up creates non-admin users. Only a trusted administrator command can grant admin access.
 - Administrators can create, edit, archive, restore, and permanently delete projects.
-- Project forms can attach a project to a main project, upload multiple images, and select a cover image.
-- Administrators can manage categories and visibility, and update site copy, logo, home image, profile photo, social links, contact details, and search metadata.
+- Project forms can attach a project to a main project, upload a description and gallery, and select a cover image. A saved subproject prompts the administrator to add another under the same parent. Subprojects inherit the parent category.
+- Administrators can manage category names, images, and visibility, and update site copy, logo, home image, profile photo, social links, contact details, and search metadata.
 - Existing inquiries and analytics remain readable from the admin area.
 
 ## 5. Functional requirements
@@ -51,10 +51,10 @@ Goals:
 | ID | Requirement | Acceptance criteria |
 |---|---|---|
 | FR-1 | Replace the Next.js public frontend and Filament admin with Laravel and Livewire. | Public and admin routes are rendered by the Laravel application; tracked Next.js and Filament application code and dependencies are removed. |
-| FR-2 | Preserve the current database and its records. | Migrations add nullable project-parent and logo fields, plus an admin flag; existing project, image, settings, inquiry, analytics, and user rows remain. No production wipe or reset is used. |
-| FR-3 | Support internal projects. | A project can be assigned to a top-level project; visitors can see its internal-project gallery and navigate to each project's detail page. |
+| FR-2 | Preserve the current database and its records. | Migrations add nullable project-parent, logo, and category-image fields, plus an admin flag; existing project, category, image, settings, inquiry, analytics, and user rows remain. No production wipe or reset is used. |
+| FR-3 | Support internal projects. | A project can be assigned to a top-level project; visitors can see a full-bleed internal-project gallery, then image-led subproject cards with descriptions and direct detail pages. Admins can add subprojects repeatedly without leaving the parent selection, and child categories inherit from the parent. |
 | FR-4 | Rotate internal-project images automatically. | The detail-page gallery advances every second when motion is allowed, pauses on request and while focused or hovered, and has manual controls. |
-| FR-5 | Provide homepage brand controls. | The admin can upload a logo and home image; the logo appears upper left, navigation upper right, and the mobile image uses roughly two thirds of the viewport height. |
+| FR-5 | Provide homepage brand controls. | The admin can upload a logo and home image; the logo is slim and centered in a sticky header, and the mobile home image uses roughly two thirds of the viewport height. |
 | FR-6 | Preserve content-management workflows. | Admins can manage projects, archived projects, images, categories, site settings, inquiries, and analytics without Filament. |
 | FR-7 | Secure admin operations. | Login is rate-limited; only admin accounts can open admin pages or call their Livewire actions; existing administrator access is retained during migration. |
 | FR-8 | Handle images safely. | Uploads are validated, resized, converted to WebP, stored on the public disk, and never accept executable files. |

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" data-theme="dark">
 @php
     $authSettings = app(\App\Support\PublicContent::class)->settings();
     $authLogo = $authSettings->publicImageUrl($authSettings->logo_path);
@@ -28,7 +28,7 @@
                 <a href="{{ route('register') }}">Sign up</a>
             @else
                 <a href="{{ route('account.password') }}">Change password</a>
-                <form method="post" action="{{ route('logout') }}">@csrf<button type="submit">Sign out</button></form>
+                <form method="post" action="{{ route('logout') }}">@csrf<button class="auth-sign-out" type="submit">Sign out</button></form>
             @endguest
         </nav>
     </header>

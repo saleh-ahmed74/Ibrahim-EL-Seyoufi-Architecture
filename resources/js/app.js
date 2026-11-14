@@ -1,7 +1,7 @@
 const applyPreferences = () => {
     try {
         const language = localStorage.getItem('site_lang') || 'en';
-        const theme = localStorage.getItem('site_theme') || 'light';
+        const theme = localStorage.getItem('site_theme') || 'dark';
 
         document.documentElement.lang = language;
         document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';

@@ -3,12 +3,12 @@
     <h1>Sign in</h1>
     <p>Use an administrator account to manage projects and site content.</p>
     <label for="email">Email address</label>
-    <input id="email" type="email" wire:model="email" autocomplete="username" required>
-    @error('email')<p class="field-error">{{ $message }}</p>@enderror
+    <input id="email" type="email" wire:model="email" autocomplete="username" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" @class(['auth-input-error' => $errors->has('email')]) required>
+    @error('email')<p class="field-error" role="alert">{{ $message }}</p>@enderror
 
     <label for="password">Password</label>
-    <input id="password" type="password" wire:model="password" autocomplete="current-password" required>
-    @error('password')<p class="field-error">{{ $message }}</p>@enderror
+    <input id="password" type="password" wire:model="password" autocomplete="current-password" aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}" @class(['auth-input-error' => $errors->has('password')]) required>
+    @error('password')<p class="field-error" role="alert">{{ $message }}</p>@enderror
 
     <button class="button" type="submit" wire:loading.attr="disabled">Sign in</button>
     <span wire:loading wire:target="login" class="loading-copy">Signing in…</span>

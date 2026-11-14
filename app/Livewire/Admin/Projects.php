@@ -51,6 +51,15 @@ class Projects extends AdminComponent
 
     public ?int $coverUploadIndex = null;
 
+    public bool $askAddAnotherSubproject = false;
+
+    public string $lastSavedSubprojectParent = '';
+
+    public function updatedParentId(): void
+    {
+        $this->categoryId = null;
+        $this->resetValidation('categoryId');
+    }
     public function updatedSearch(): void
     {
         $this->resetPage();
@@ -85,7 +94,7 @@ class Projects extends AdminComponent
         $this->slug = $this->slug ?: Str::slug($this->title);
 
         $validated = $this->validate([
-            'categoryId' => ['nullable', 'integer', Rule::exists('categories', 'id')],
+            'categoryId' => [$this->parentId ? 'nullable' : 'required', 'integer', Rule::exists('categories', 'id')],
             'parentId' => [
                 'nullable',
                 'integer',
@@ -98,7 +107,7 @@ class Projects extends AdminComponent
             'location' => ['nullable', 'string', 'max:255'],
             'year' => ['nullable', 'integer', 'min:1800', 'max:2200'],
             'sortOrder' => ['required', 'integer', 'min:0', 'max:65535'],
-            'imageUploads' => ['array', 'max:20'],
+            'imageUploads' => $this->editingId || $this->existingImages ? ['array', 'max:20'] : ['required', 'array', 'min:1', 'max:20'],
             'imageUploads.*' => ['image', 'mimes:jpeg,jpg,png,webp', 'max:8192'],
             'coverUploadIndex' => ['nullable', 'integer', 'min:0'],
         ]);
@@ -109,14 +118,24 @@ class Projects extends AdminComponent
             return;
         }
 
+        $resolvedParent = $validated['parentId'] !== null
+            ? Project::query()->rootProjects()->findOrFail($validated['parentId'])
+            : null;
+        $resolvedCategoryId = $validated['parentId'] !== null
+            ? $resolvedParent->category_id
+            : ($validated['categoryId'] ?: null);
+        $wasNewSubproject = $this->editingId === null && $validated['parentId'] !== null;
+        $savedParentId = $validated['parentId'];
+        $savedParentTitle = $resolvedParent?->title ?? '';
+
         $storedPaths = [];
 
         try {
-            DB::transaction(function () use ($validated, &$storedPaths): void {
+            DB::transaction(function () use ($validated, $resolvedCategoryId, &$storedPaths): void {
             $project = Project::query()->withTrashed()->updateOrCreate(
                 ['id' => $this->editingId],
                 [
-                    'category_id' => $validated['categoryId'] ?: null,
+                    'category_id' => $resolvedCategoryId,
                     'parent_id' => $validated['parentId'] ?: null,
                     'title' => $validated['title'],
                     'slug' => $validated['slug'],
@@ -129,6 +148,10 @@ class Projects extends AdminComponent
 
             if ($project->trashed()) {
                 $project->restore();
+            }
+
+            if ($project->parent_id === null) {
+                Project::query()->where('parent_id', $project->id)->update(['category_id' => $resolvedCategoryId]);
             }
 
             $sortOrder = $project->images()->count();
@@ -172,6 +195,17 @@ class Projects extends AdminComponent
 
         $content->invalidate();
         $this->resetForm();
+
+        if ($wasNewSubproject && $savedParentId !== null) {
+            $this->parentId = $savedParentId;
+            $this->sortOrder = ((int) Project::query()->where('parent_id', $savedParentId)->max('sort_order')) + 1;
+            $this->lastSavedSubprojectParent = $savedParentTitle;
+            $this->askAddAnotherSubproject = true;
+            session()->flash('status', 'Subproject saved.');
+
+            return;
+        }
+
         session()->flash('status', 'Project saved.');
     }
 
@@ -262,11 +296,22 @@ class Projects extends AdminComponent
         session()->flash('status', 'Archived project and its subprojects permanently deleted.');
     }
 
+    public function continueAddingSubproject(): void
+    {
+        $this->askAddAnotherSubproject = false;
+        $this->resetValidation();
+    }
+
+    public function finishAddingSubprojects(): void
+    {
+        $this->resetForm();
+    }
     public function resetForm(): void
     {
         $this->reset([
             'editingId', 'categoryId', 'parentId', 'title', 'slug', 'description',
             'location', 'year', 'imageUploads', 'existingImages', 'coverImageId', 'coverUploadIndex',
+            'askAddAnotherSubproject', 'lastSavedSubprojectParent',
         ]);
         $this->sortOrder = 0;
         $this->resetValidation();
@@ -275,7 +320,7 @@ class Projects extends AdminComponent
     public function render()
     {
         $projects = Project::query()
-            ->with(['category', 'parent', 'coverImage', 'children'])
+            ->with(['category', 'parent.category', 'coverImage', 'children'])
             ->when($this->status === 'archived', fn ($query) => $query->onlyTrashed())
             ->when($this->status !== 'archived', fn ($query) => $query->whereNull('deleted_at'))
             ->when($this->search, fn ($query) => $query->where(fn ($query) => $query
@@ -290,6 +335,7 @@ class Projects extends AdminComponent
         return view('livewire.admin.projects', [
             'projects' => $projects,
             'categories' => Category::query()->orderBy('sort_order')->get(),
+            'selectedParent' => $this->parentId ? Project::query()->with('category')->find($this->parentId) : null,
             'parentProjects' => Project::query()
                 ->rootProjects()
                 ->when($this->editingId, fn ($query) => $query->where('id', '<>', $this->editingId))

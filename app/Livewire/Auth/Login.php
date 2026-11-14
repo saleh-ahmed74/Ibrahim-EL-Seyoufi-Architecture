@@ -34,15 +34,10 @@ class Login extends Component
         $key = Str::lower($this->email).'|'.request()->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
-            $retryAfter = RateLimiter::availableIn($key);
-
-            throw new HttpResponseException(response()->json(
-                ['message' => 'Too many sign-in attempts. Please wait before trying again.'],
-                429,
-                ['Retry-After' => (string) $retryAfter],
-            ));
+            throw ValidationException::withMessages([
+                'email' => 'Too many sign-in attempts. Try again in '.RateLimiter::availableIn($key).' seconds.',
+            ]);
         }
-
         if (! Auth::attempt($credentials)) {
             RateLimiter::hit($key, 60);
 
