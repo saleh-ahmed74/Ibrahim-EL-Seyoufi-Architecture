@@ -15,7 +15,7 @@
         <p class="title">{{ $settings->professional_title }}</p>
         @if ($settings->short_bio)<p class="intro">{{ $settings->short_bio }}</p>@endif
         <div class="cta-row">
-            <a class="button" href="{{ route('projects.index') }}">View projects</a>
+            <a class="button hero-projects-button" href="{{ route('projects.index') }}"><span data-en="View projects" data-ar="عرض المشاريع">View projects</span><span class="button-arrow" aria-hidden="true">↗</span></a>
             @if ($settings->whatsapp_number)
                 <a class="button secondary" href="https://wa.me/{{ preg_replace('/\D/', '', $settings->whatsapp_number) }}?text={{ urlencode($settings->whatsapp_message ?? '') }}" target="_blank" rel="noopener noreferrer">Get in touch ↗</a>
             @endif
