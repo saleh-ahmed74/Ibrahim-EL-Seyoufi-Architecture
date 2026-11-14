@@ -1087,3 +1087,12 @@ h2 {
 [data-theme=dark] .dashboard-project-item::after{color:#b8c6aa}
 @media(max-width:1100px){.project-admin-grid{grid-template-columns:1fr}.project-library{order:-1}.dashboard-project-list{grid-template-columns:1fr}}
 @media(max-width:620px){.project-form-fields{grid-template-columns:1fr}.project-form-fields>.admin-field:has(textarea),.project-form-fields>.project-detail-fields,.project-form-fields>.project-image-manager,.project-form-fields>.upload-field,.project-form-fields>.loading-copy,.project-form-fields>.project-form-actions{grid-column:auto}.admin-main-project-card{grid-template-columns:64px minmax(0,1fr);gap:10px;padding:11px}.admin-main-project-cover{width:64px;height:54px}.admin-main-project-heading{align-items:flex-start}.admin-main-project-heading .project-count-pill{position:static;margin-top:4px}.admin-main-project-actions{gap:6px}.admin-subproject-row{grid-template-columns:48px minmax(0,1fr);gap:9px}.admin-subproject-thumb{width:48px;height:42px}.admin-subproject-actions{grid-column:2;justify-content:flex-start}.dashboard-project-item{grid-template-columns:64px minmax(0,1fr);grid-template-rows:auto auto auto}.dashboard-project-cover{grid-row:1/4;width:64px;height:54px}.dashboard-project-item .project-count-pill{grid-column:2}.dashboard-project-item::after{grid-column:2}.dashboard-projects-heading{flex-direction:row;align-items:center}.dashboard-projects-heading .button{flex:0 0 auto}}
+
+/* Social links in the sticky site header */
+.social-icon-list{display:flex;align-items:center;gap:8px}
+.header-socials{grid-column:2;grid-row:1;justify-self:end;display:flex;align-items:center;position:relative;z-index:2}
+.header-socials .social-link{width:34px;height:34px;background:var(--surface)}
+.header-socials .social-link svg{width:16px;height:16px}
+.header-socials .social-link:hover{border-color:var(--accent);background:var(--accent);color:var(--bg)}
+@media(max-width:760px){.site-nav{grid-template-rows:auto auto}.header-socials{grid-column:1/-1;grid-row:2;justify-self:stretch;justify-content:flex-end;padding-top:5px;border-top:1px solid var(--line)}.header-socials .social-icon-list{justify-content:flex-end}.header-socials .social-link{width:30px;height:30px}.header-socials .social-icon-list{gap:6px}}
+@media(max-width:620px){.site-brand.has-logo{top:28px}.site-brand.has-name{grid-row:1}.header-socials .social-link{width:28px;height:28px}}
