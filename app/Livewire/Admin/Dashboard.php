@@ -9,10 +9,40 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('layouts.admin')]
 class Dashboard extends AdminComponent
 {
+    use WithPagination;
+
+    public string $categoryFilter = '';
+
+    public string $yearFilter = '';
+
+    public string $projectSearch = '';
+
+    public function updatedCategoryFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedYearFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedProjectSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function clearProjectFilters(): void
+    {
+        $this->reset(['categoryFilter', 'yearFilter', 'projectSearch']);
+        $this->resetPage();
+    }
+
     public function render()
     {
         $projectsByCategory = Category::query()
@@ -32,7 +62,21 @@ class Dashboard extends AdminComponent
             ->map(fn (Project $project): array => ['year' => $project->year, 'count' => $project->count])
             ->all();
 
-        $portfolioProjects = Project::query()->rootProjects()->withCount('children')->with(['category', 'coverImage', 'images' => fn ($images) => $images->limit(1)])->orderBy('sort_order')->orderByDesc('year')->limit(4)->get();
+        $portfolioProjects = Project::query()
+            ->rootProjects()
+            ->withCount('children')
+            ->with(['category', 'coverImage', 'images' => fn ($images) => $images->limit(1)])
+            ->when($this->categoryFilter !== '', fn ($query) => $query->whereHas('category', fn ($category) => $category->where('slug', $this->categoryFilter)))
+            ->when($this->yearFilter !== '', fn ($query) => $query->where('year', (int) $this->yearFilter))
+            ->when(trim($this->projectSearch) !== '', fn ($query) => $query->where(function ($query): void {
+                $search = '%'.trim($this->projectSearch).'%';
+                $query->where('title', 'like', $search)
+                    ->orWhere('slug', 'like', $search)
+                    ->orWhere('location', 'like', $search);
+            }))
+            ->orderBy('sort_order')
+            ->orderByDesc('year')
+            ->paginate(8);
 
         $files = Storage::disk('public')->allFiles();
 
@@ -45,6 +89,8 @@ class Dashboard extends AdminComponent
             'storageFiles' => count($files),
             'storageBytes' => collect($files)->sum(fn (string $file): int => Storage::disk('public')->size($file)),
             'portfolioProjects' => $portfolioProjects,
+            'projectFilterCategories' => Category::query()->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'slug']),
+            'projectFilterYears' => Project::query()->rootProjects()->whereNotNull('year')->distinct()->orderByDesc('year')->pluck('year'),
             'projectsByCategory' => $projectsByCategory,
             'projectsByYear' => $projectsByYear,
         ]);

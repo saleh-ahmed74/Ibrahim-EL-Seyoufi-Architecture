@@ -7,10 +7,19 @@
     </div>
     <section class="admin-panel dashboard-projects-panel">
         <header class="dashboard-projects-heading"><div><span class="eyebrow">Portfolio</span><h2>Main projects</h2><p>Open the project manager to edit a project or expand its subprojects.</p></div><a class="button" href="{{ route('admin.projects') }}">Open project manager</a></header>
+        <div class="dashboard-project-filters" aria-label="Filter projects">
+            <label><span>Category</span><select wire:model.live="categoryFilter"><option value="">All categories</option>@foreach($projectFilterCategories as $filterCategory)<option value="{{ $filterCategory->slug }}">{{ $filterCategory->name }}</option>@endforeach</select></label>
+            <label><span>Year</span><select wire:model.live="yearFilter"><option value="">All years</option>@foreach($projectFilterYears as $filterYear)<option value="{{ $filterYear }}">{{ $filterYear }}</option>@endforeach</select></label>
+            <label class="dashboard-project-search"><span>Search projects</span><input type="search" wire:model.live.debounce.300ms="projectSearch" placeholder="Name, location or page address…"></label>
+            @if($categoryFilter || $yearFilter || $projectSearch)
+                <button class="dashboard-filter-clear" type="button" wire:click="clearProjectFilters">Clear filters <span aria-hidden="true">×</span></button>
+            @endif
+        </div>
+        <p class="dashboard-project-results">{{ $portfolioProjects->total() }} {{ $portfolioProjects->total() === 1 ? 'project' : 'projects' }} found</p>
         <div class="dashboard-project-list">
             @forelse($portfolioProjects as $project)
                 @php $dashboardCover = $project->coverImage ?: $project->images->first(); @endphp
-                <a class="dashboard-project-item" href="{{ route('admin.projects') }}">
+                <a class="dashboard-project-item" href="{{ route('admin.projects', ['search' => $project->title]) }}">
                     <span class="dashboard-project-cover">@if($dashboardCover)<img src="{{ $dashboardCover->publicUrl() }}" alt="" loading="lazy">@else<span class="image-placeholder"></span>@endif</span>
                     <span class="dashboard-project-copy"><strong>{{ $project->title }}</strong><small>{{ $project->category?->name ?: 'Architecture' }}@if($project->location) · {{ $project->location }}@endif @if($project->year) · {{ $project->year }}@endif</small></span>
                     <span class="project-count-pill">{{ $project->children_count }} {{ $project->children_count === 1 ? 'subproject' : 'subprojects' }}</span><span class="dashboard-project-arrow" aria-hidden="true">↗</span>
@@ -19,6 +28,7 @@
                 <p class="empty-state">No projects yet. Open the project manager to add the first one.</p>
             @endforelse
         </div>
+        {{ $portfolioProjects->links() }}
     </section>
     <section class="admin-panel">
         <h2>Projects by category</h2>

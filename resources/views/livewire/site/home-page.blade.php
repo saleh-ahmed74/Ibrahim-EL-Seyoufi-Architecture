@@ -27,7 +27,7 @@
 <section class="section" id="selected-work">
     <div class="section-head">
         <div><span class="eyebrow">Selected work</span><h2>Projects</h2></div>
-        <a class="text-link" href="{{ route('projects.index') }}">All projects →</a>
+        <a class="button secondary all-projects-button" href="{{ route('projects.index') }}"><span data-en="All projects" data-ar="كل المشاريع">All projects</span><span aria-hidden="true">↗</span></a>
     </div>
 
     @include('livewire.site.category-filter', ['categories' => $categories, 'projects' => $projects, 'settings' => $settings, 'selectedCategory' => $category])
