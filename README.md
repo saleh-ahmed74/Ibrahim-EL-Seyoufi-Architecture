@@ -21,7 +21,7 @@ This application is a Laravel 12, Livewire 4, and MySQL portfolio site. The publ
 8. Build assets with `npm run build`.
 9. Start Laravel at `http://127.0.0.1:8585` with `php artisan serve --port=8585`.
 
-The development seeder creates sample categories, site settings, and portfolio projects. It does not insert a default administrator password. Do not run seeders against a live database.
+The database seeder adds starter categories, settings, and projects only when those records do not already exist. It preserves existing site settings, projects, and categories. It does not insert a default administrator password. Do not seed a live database without a verified backup.
 
 ## Administrator
 

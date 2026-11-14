@@ -1,3 +1,4 @@
+<div class="home-page">
 <section class="hero" aria-label="Featured architecture work">
     @if ($heroSlides->isNotEmpty())
         <div class="hero-slideshow" x-data="{ active: 0, count: {{ $heroSlides->count() }} }" @if($heroSlides->count() > 1) x-init="setInterval(() => active = (active + 1) % count, 3200)" @endif>
@@ -55,3 +56,4 @@
     <p>{{ $settings->short_bio ?: $settings->bio }}</p>
     <a class="text-link" href="{{ route('about') }}">More about the studio →</a>
 </section>
+</div>
