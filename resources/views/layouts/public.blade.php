@@ -60,7 +60,12 @@
     <main>{{ $slot }}</main>
 
     @if ($whatsapp)
-        <a class="whatsapp-fab" href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="Contact on WhatsApp">↗</a>
+        <a class="whatsapp-fab" href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" aria-label="Contact on WhatsApp" title="WhatsApp">
+            <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                <path d="M16 3.2a12.65 12.65 0 0 0-10.8 19.2L3.5 28.5l6.3-1.65A12.65 12.65 0 1 0 16 3.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 9.8c-.35-.78-.73-.8-1.08-.8h-.92c-.32 0-.84.12-1.28.6-.44.47-1.68 1.64-1.68 4s1.72 4.63 1.96 4.95c.24.31 3.33 5.32 8.22 7.24 4.05 1.6 4.88 1.28 5.76 1.2.88-.08 2.84-1.16 3.24-2.28.4-1.12.4-2.08.28-2.28-.12-.2-.44-.32-.92-.56s-2.84-1.4-3.28-1.56c-.44-.16-.76-.24-1.08.24-.32.48-1.24 1.56-1.52 1.88-.28.32-.56.36-1.04.12-.48-.24-2.02-.75-3.85-2.38-1.42-1.27-2.38-2.84-2.66-3.32-.28-.48-.03-.74.21-.98.21-.21.48-.56.72-.84.24-.28.32-.48.48-.8.16-.32.08-.6-.04-.84-.12-.24-1.05-2.6-1.45-3.54Z" fill="currentColor" transform="translate(4 0) scale(.76)"/>
+            </svg>
+        </a>
     @endif
 
     <footer class="site-footer">
