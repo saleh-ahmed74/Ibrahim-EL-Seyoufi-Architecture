@@ -883,3 +883,16 @@ h2 {
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 .site-menu-toggle{display:none;align-items:center;justify-content:center;width:42px;height:42px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font-size:1.2rem;cursor:pointer}
 @media(max-width:620px){.site-nav{position:relative;grid-template-columns:minmax(0,1fr) auto auto}.site-menu-toggle{grid-column:2;grid-row:1;display:inline-flex}.site-actions{grid-column:3;grid-row:1}.site-menu{position:absolute;top:calc(100% + 8px);right:12px;z-index:50;display:grid;grid-column:auto;grid-row:auto;justify-self:auto;width:min(86vw,320px);gap:0;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);box-shadow:0 16px 40px #1113;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .16s ease,transform .16s ease,visibility .16s}.site-menu.is-open{opacity:1;visibility:visible;transform:translateY(0)}.site-menu>a,.site-menu .site-logout-form button{display:block;padding:12px 10px}.site-menu .site-logout-form{padding:0 10px}}
+/* Public navigation dropdown: pages, account actions, language and color mode stay together. */
+.site-nav{position:relative;grid-template-columns:minmax(0,1fr) auto;direction:ltr}
+.site-menu-toggle{display:inline-flex;grid-column:2;grid-row:1}
+.site-menu{position:absolute;top:calc(100% + 8px);right:var(--pad);z-index:60;display:grid;grid-template-columns:1fr;justify-self:auto;width:min(90vw,330px);gap:2px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);box-shadow:0 16px 40px #1113;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .16s ease,transform .16s ease,visibility .16s}
+.site-menu.is-open{opacity:1;visibility:visible;transform:translateY(0)}
+.site-menu>a,.site-menu .site-logout-form button{display:block;width:100%;padding:10px 12px;border:0;border-radius:6px;background:transparent;color:var(--ink);font:inherit;text-align:start;cursor:pointer}
+.site-menu>a:hover,.site-menu .site-logout-form button:hover,.site-menu-option:hover{background:var(--surface)}
+.site-menu-section-label{padding:8px 12px 3px;color:var(--muted);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.site-menu-preferences-label{margin-top:8px;border-top:1px solid var(--line);padding-top:14px}
+.site-menu-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:7px 8px 4px}
+.site-menu-option{min-height:40px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--ink);font:inherit;font-size:.8rem;text-align:center;cursor:pointer}
+.site-logout-form{margin:0}
+@media(max-width:620px){.site-nav{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}.site-menu-toggle{grid-column:2;grid-row:1}.site-menu{right:12px;grid-column:auto;grid-row:auto;width:min(88vw,330px);padding:12px}.site-menu-controls{grid-template-columns:1fr 1fr}.site-logo{max-width:38vw;height:42px}}

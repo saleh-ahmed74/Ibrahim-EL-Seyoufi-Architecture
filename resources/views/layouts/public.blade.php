@@ -22,7 +22,7 @@
             : null;
     @endphp
 
-    <header class="nav site-nav" x-data="{ menuOpen: false }" x-on:keydown.escape.window="menuOpen = false">
+    <header class="nav site-nav" x-data="{ menuOpen: false }" x-on:keydown.escape.window="menuOpen = false" x-on:click.outside="menuOpen = false">
         <a class="site-brand" href="{{ route('home') }}" aria-label="{{ $settings?->site_name ?? 'Home' }}">
             @if ($logoUrl)
                 <img class="site-logo" src="{{ $logoUrl }}" alt="{{ $settings?->site_name ?? 'Site logo' }}">
@@ -31,22 +31,24 @@
             @endif
         </a>
         <button class="site-menu-toggle" type="button" x-bind:aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'" x-on:click="menuOpen = !menuOpen" x-bind:aria-expanded="menuOpen.toString()">☰</button>
-        <nav class="site-menu" aria-label="Main navigation" x-bind:class="menuOpen ? 'is-open' : ''" x-on:click="menuOpen = false">
+        <nav class="site-menu" aria-label="Main navigation" x-bind:class="menuOpen ? 'is-open' : ''">
+            <span class="site-menu-section-label" data-en="Pages" data-ar="الصفحات">Pages</span>
             <a href="{{ route('home') }}" data-en="Home" data-ar="الرئيسية">Home</a>
             <a href="{{ route('projects.index') }}" data-en="Projects" data-ar="المشاريع">Projects</a>
             <a href="{{ route('about') }}" data-en="About" data-ar="من نحن">About</a>
             @guest
-                <a href="{{ route('login') }}">Sign in</a>
-                <a href="{{ route('register') }}">Sign up</a>
+                <a href="{{ route('login') }}" data-en="Sign in" data-ar="تسجيل الدخول">Sign in</a>
+                <a href="{{ route('register') }}" data-en="Sign up" data-ar="إنشاء حساب">Sign up</a>
             @else
-                <a href="{{ route('account.password') }}">Account</a>
-                <form method="post" action="{{ route('logout') }}" class="site-logout-form">@csrf<button type="submit">Sign out</button></form>
+                <a href="{{ route('account.password') }}" data-en="Account" data-ar="الحساب">Account</a>
+                <form method="post" action="{{ route('logout') }}" class="site-logout-form">@csrf<button type="submit" data-en="Sign out" data-ar="تسجيل الخروج">Sign out</button></form>
             @endguest
+            <span class="site-menu-section-label site-menu-preferences-label" data-en="Preferences" data-ar="التفضيلات">Preferences</span>
+            <div class="site-menu-controls" aria-label="Site preferences">
+                <button type="button" class="site-menu-option" data-language-toggle aria-label="Change language">العربية</button>
+                <button type="button" class="site-menu-option" data-theme-toggle data-light-label="Dark mode" data-dark-label="Light mode" aria-label="Change color mode">Dark mode</button>
+            </div>
         </nav>
-        <div class="site-actions">
-            <button type="button" class="text-action" data-language-toggle aria-label="Change language">العربية</button>
-            <button type="button" class="text-action" data-theme-toggle aria-label="Toggle color theme">◐</button>
-        </div>
     </header>
 
     <div class="network-status" id="network-status" role="status" aria-live="polite" hidden></div>

@@ -15,7 +15,7 @@ const applyPreferences = () => {
         if (languageToggle) languageToggle.textContent = language === 'en' ? 'العربية' : 'English';
 
         const themeToggle = document.querySelector('[data-theme-toggle]');
-        if (themeToggle) themeToggle.textContent = theme === 'dark' ? '☀' : '◐';
+        if (themeToggle) themeToggle.textContent = theme === 'dark' ? (themeToggle.dataset.darkLabel || 'Light mode') : (themeToggle.dataset.lightLabel || 'Dark mode');
     } catch {}
 };
 
