@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -21,6 +22,7 @@ class Projects extends AdminComponent
 {
     use WithFileUploads, WithPagination;
 
+    #[Url]
     public string $search = '';
 
     public string $status = 'active';
