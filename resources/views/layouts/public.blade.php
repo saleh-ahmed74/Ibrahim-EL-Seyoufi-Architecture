@@ -22,7 +22,7 @@
             : null;
     @endphp
 
-    <header class="nav site-nav">
+    <header class="nav site-nav" x-data="{ menuOpen: false }" x-on:keydown.escape.window="menuOpen = false">
         <a class="site-brand" href="{{ route('home') }}" aria-label="{{ $settings?->site_name ?? 'Home' }}">
             @if ($logoUrl)
                 <img class="site-logo" src="{{ $logoUrl }}" alt="{{ $settings?->site_name ?? 'Site logo' }}">
@@ -30,10 +30,18 @@
                 <span class="wordmark">{{ $settings?->site_name ?? 'Architecture' }}</span>
             @endif
         </a>
-        <nav class="site-menu" aria-label="Main navigation">
+        <button class="site-menu-toggle" type="button" x-bind:aria-label="menuOpen ? 'Close navigation menu' : 'Open navigation menu'" x-on:click="menuOpen = !menuOpen" x-bind:aria-expanded="menuOpen.toString()">☰</button>
+        <nav class="site-menu" aria-label="Main navigation" x-bind:class="menuOpen ? 'is-open' : ''" x-on:click="menuOpen = false">
             <a href="{{ route('home') }}" data-en="Home" data-ar="الرئيسية">Home</a>
             <a href="{{ route('projects.index') }}" data-en="Projects" data-ar="المشاريع">Projects</a>
             <a href="{{ route('about') }}" data-en="About" data-ar="من نحن">About</a>
+            @guest
+                <a href="{{ route('login') }}">Sign in</a>
+                <a href="{{ route('register') }}">Sign up</a>
+            @else
+                <a href="{{ route('account.password') }}">Account</a>
+                <form method="post" action="{{ route('logout') }}" class="site-logout-form">@csrf<button type="submit">Sign out</button></form>
+            @endguest
         </nav>
         <div class="site-actions">
             <button type="button" class="text-action" data-language-toggle aria-label="Change language">العربية</button>
@@ -58,6 +66,7 @@
         </div>
         <span>{{ $settings?->site_name ?? 'Architecture Portfolio' }}</span>
         <span>© {{ now()->year }}</span>
+        <a class="admin-login-link" href="{{ route('admin.login') }}">Administrator sign in</a>
     </footer>
 
     @livewireScripts

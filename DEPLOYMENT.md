@@ -25,7 +25,7 @@
    php artisan storage:link
    ```
    The migrations are additive and retain current content. Do not run `migrate:fresh` or `db:wipe` in production.
-10. Create an admin account using `php artisan admin:create` from the server's trusted command runner. Do not add a public account-creation route. The web login is limited to five failed attempts per email and IP; authenticated admin pages are limited to 120 requests per user and IP per minute.
+10. Create or promote an admin account using `php artisan admin:create` from the server's trusted command runner. Public sign-up creates non-admin accounts only. The web login is limited to five failed attempts per email and IP; authenticated admin pages are limited to 120 requests per user and IP per minute.
 11. Visit the home page, project listing, a project with internal projects, About, and all admin screens. Check one logo upload, one gallery upload, HTTPS, and offline fallback in the production domain.
 12. Verify that `/.env`, `/.git/config`, `/vendor/`, `/storage/`, `/composer.json`, and `/artisan` return 403 or 404.
 
@@ -45,7 +45,7 @@ For local development, the Laravel server uses port `8585`: `php artisan serve -
 - Configure an external error and uptime monitor and name its alert recipient; the application `/up` route is available as a health check.
 - Measure representative traffic on staging before setting p95, availability, or capacity targets. No concurrency or performance guarantee is assumed here.
 - Configure trusted proxy addresses at the hosting layer when the app is behind a load balancer. Do not trust arbitrary forwarded IP headers.
-- Enable MFA for named administrator accounts before public launch, or have the site owner formally accept the temporary exception and set a review date. There is no public registration; use the trusted CLI command to create or reset an admin.
+- Enable MFA for named administrator accounts before public launch, or have the site owner formally accept the temporary exception and set a review date. Public accounts cannot grant themselves administrator access; use the trusted CLI command to create or reset an admin.
 
 Tests are configured for a separate MySQL database named `architecture_portfolio_test`; create it before running tests so no command can target the portfolio database by mistake.
 

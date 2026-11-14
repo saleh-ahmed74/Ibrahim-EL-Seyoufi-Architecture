@@ -12,4 +12,6 @@
 
     <button class="button" type="submit" wire:loading.attr="disabled">Sign in</button>
     <span wire:loading wire:target="login" class="loading-copy">Signing in…</span>
+    <a class="auth-secondary-link" href="{{ route('password.request') }}">Forgot password?</a>
+    <a class="auth-secondary-link" href="{{ route('login') }}">Public account sign in</a>
 </form>

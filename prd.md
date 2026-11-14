@@ -34,12 +34,13 @@ Goals:
 - The home image occupies about two thirds of a mobile viewport, with the portfolio introduction overlaid.
 - The home page lists main projects and supports category filtering.
 - A main project may contain internal projects. Its detail page automatically rotates through internal-project cover images every second, with manual controls and a pause option.
-- A project without internal projects continues to show its own cover and image gallery.
+- A project without internal projects continues to show its own image gallery, which also advances every second.
 - Existing project, category, biography, social, contact, language, and theme content remains available.
 
 ### Administrator
 
-- Private sign-in is available at /admin/login; there is no public registration.
+- Administrator sign-in is available at /admin/login. Public account sign-in, sign-up, email verification, password recovery, and password change are available from the public navigation.
+- Public sign-up creates non-admin users. Only a trusted administrator command can grant admin access.
 - Administrators can create, edit, archive, restore, and permanently delete projects.
 - Project forms can attach a project to a main project, upload multiple images, and select a cover image.
 - Administrators can manage categories and visibility, and update site copy, logo, home image, profile photo, social links, contact details, and search metadata.
@@ -59,6 +60,8 @@ Goals:
 | FR-8 | Handle images safely. | Uploads are validated, resized, converted to WebP, stored on the public disk, and never accept executable files. |
 | FR-9 | Handle network interruption gracefully. | Public assets and a bounded number of previously opened public pages can be served from cache; admin pages, Livewire requests, uploads, and form submissions are never cached. Offline visitors receive a clear message and manual refresh action. |
 | FR-10 | Maintain public metadata and navigability. | Home, Projects, About, and project detail routes use stable named URLs, page titles, descriptions, and canonical URLs. |
+| FR-11 | Provide complete account access flows. | Users can register, verify email, sign in, sign out, request a reset link, reset a forgotten password, and change a password after confirming the current one. |
+| FR-12 | Enforce authentication and authorization on the server. | Sessions use CSRF protection, rotate after authentication, and are invalidated on logout; registration cannot create admins; every admin route and Livewire action checks `is_admin`; login, registration, verification, and reset requests are rate-limited. |
 
 ## 6. Production and quality requirements
 
@@ -75,13 +78,12 @@ Goals:
 - Keep existing projects, project images, categories, site settings, users, inquiries, and page views tables and their data.
 - Add a nullable self-referencing projects.parent_id so old projects remain top-level by default.
 - Add nullable site_settings.logo_path.
-- Add users.is_admin; existing accounts keep the access they previously had, while future accounts default to non-admin.
+- Add users.is_admin as false by default. Promote selected administrators explicitly through the trusted CLI; new public registrations remain non-admin.
 - Do not run migrate:fresh, db:wipe, or destructive production rollbacks.
 
 ## 8. Out of scope
 
 - Replacing MySQL or importing content into a new database.
-- A public account-registration flow.
 - Editing portfolio content while offline.
 - Introducing a new visual identity or copying unrelated storefront functionality from Athar.
 

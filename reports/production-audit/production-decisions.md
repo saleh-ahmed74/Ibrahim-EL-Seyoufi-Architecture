@@ -7,7 +7,7 @@ Reviewed against the transferable production decision template on 2026-11-14. Th
 | Area | Project decision | Implementation |
 |---|---|---|
 | Database | MySQL only | MySQL is the application and test connection. SQLite connection configuration and local SQLite databases are removed. Tests target a separate `architecture_portfolio_test` database. |
-| Browser authentication | Laravel web sessions, cookies, and CSRF | Admin accounts are created or reset only by `php artisan admin:create`; there is no public registration or API token flow. Session IDs rotate at login, logout invalidates the session and CSRF token, and session payloads are encrypted. |
+| Browser authentication | Laravel web sessions, cookies, and CSRF | Public registration creates non-admin accounts; administrator access is granted only by `php artisan admin:create`. There is no API token flow. Session IDs rotate at login, logout invalidates the session and CSRF token, and session payloads are encrypted. |
 | Login persistence | No persistent remember-me cookie | Admin sessions use the configured idle lifetime instead of extending via a long-lived recaller cookie. |
 | Authorization | Server-side administrator flag | Admin routes and every Livewire admin component check `is_admin`. Login errors do not reveal whether an account exists. |
 | Rate limits | Separate login and admin limits | Five failed sign-in attempts per normalized email and IP per minute; login route requests are limited to 30 per IP per minute; admin requests are limited to 120 per user and IP per minute. Laravel returns 429 responses and `Retry-After`. |
@@ -16,7 +16,7 @@ Reviewed against the transferable production decision template on 2026-11-14. Th
 | Retries and offline use | Public GET pages may fall back to saved pages; writes are never retried automatically | The service worker does not cache admin pages, Livewire requests, or non-GET requests. The browser explains 401/403, 419, 429, network, and server failures; uncertain writes require checking saved state before resubmitting. |
 | Development URL | Port `8585` | Composer's development command and local instructions use `http://127.0.0.1:8585`. |
 
-The site has no checkout, payment, public account creation, or external HTTP integration, so commerce idempotency and outbound HTTP retry rules do not currently apply. The existing personal-access-token migration is retained as historical schema compatibility; token authentication is not installed or used.
+The site has no checkout, payment, administrator self-registration, or external HTTP integration, so commerce idempotency and outbound HTTP retry rules do not currently apply. The existing personal-access-token migration is retained as historical schema compatibility; token authentication is not installed or used.
 
 ## Hosting decisions still required
 

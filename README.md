@@ -31,11 +31,11 @@ The database seeder adds starter categories, settings, and projects only when th
 - Upload the site logo, home image, and profile photo at `/admin/settings`.
 - Review inquiries and existing site statistics from the admin menu.
 
-Create or reset an administrator only from a trusted terminal with `php artisan admin:create`. There is no public registration route.
+Create or reset an administrator only from a trusted terminal with `php artisan admin:create`. Public sign-up creates standard accounts and cannot grant administrator access.
 
 ## Data and migrations
 
-The current MySQL schema remains the source of truth. New migrations add an optional `parent_id` to the existing `projects` table, a nullable logo path to `site_settings`, and an admin flag to existing users. Existing project, image, settings, user, inquiry, and analytics rows are retained. The admin migration preserves the access of accounts that already existed before the refactor.
+The current MySQL schema remains the source of truth. New migrations add an optional `parent_id` to the existing `projects` table, a nullable logo path to `site_settings`, and an admin flag that defaults to false. Existing project, image, settings, user, inquiry, and analytics rows are retained. Grant admin access only to selected accounts through the trusted CLI command.
 
 Back up the database and uploaded images before a production migration. Never use `migrate:fresh`, `db:wipe`, or destructive rollbacks on production.
 

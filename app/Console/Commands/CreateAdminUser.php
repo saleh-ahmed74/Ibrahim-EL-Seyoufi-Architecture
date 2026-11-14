@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,10 +35,15 @@ class CreateAdminUser extends Command
             return self::FAILURE;
         }
 
-        User::query()->updateOrCreate(
-            ['email' => $email],
-            ['name' => $name, 'password' => Hash::make($password), 'is_admin' => true],
-        );
+        DB::transaction(function () use ($email, $name, $password): void {
+            $user = User::query()->firstOrNew(['email' => $email]);
+            $user->fill(['name' => $name, 'password' => Hash::make($password), 'is_admin' => true]);
+            $user->save();
+
+            if (config('session.driver') === 'database') {
+                DB::table(config('session.table'))->where('user_id', $user->id)->delete();
+            }
+        });
 
         $this->components->info('Administrator account is ready.');
 

@@ -60,7 +60,12 @@
             <div class="description prose">{{ $project->description }}</div>
         @endif
         @if ($project->images->isNotEmpty())
-            <div class="project-gallery" x-data="{ active: 0, count: {{ $project->images->count() }}, next() { this.active = (this.active + 1) % this.count }, previous() { this.active = (this.active - 1 + this.count) % this.count } }">
+            <div class="project-gallery" x-data="{ active: 0, count: {{ $project->images->count() }}, paused: false, timer: null,
+                start() { if (this.count > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.timer = window.setInterval(() => { if (!this.paused && !document.hidden) this.active = (this.active + 1) % this.count }, 1000) },
+                destroy() { if (this.timer) window.clearInterval(this.timer) },
+                next() { this.active = (this.active + 1) % this.count },
+                previous() { this.active = (this.active - 1 + this.count) % this.count } }"
+                x-init="start()" x-on:mouseenter="paused = true" x-on:mouseleave="paused = false" x-on:focusin="paused = true" x-on:focusout="paused = false">
                 <div class="gallery-main">
                     @foreach ($project->images as $index => $image)
                         <img class="gallery-focus-image" x-show="active === {{ $index }}" x-cloak src="{{ $image->publicUrl() }}" alt="{{ $image->alt_text ?: $project->title.' '.($index + 1) }}" @if($index > 0) loading="lazy" @endif>
@@ -68,6 +73,7 @@
                     @if ($project->images->count() > 1)
                         <button class="gallery-nav prev" type="button" x-on:click="previous()" aria-label="Previous image">‹</button>
                         <button class="gallery-nav next" type="button" x-on:click="next()" aria-label="Next image">›</button>
+                        <button class="pause-gallery" type="button" x-on:click="paused = !paused" x-text="paused ? 'Play' : 'Pause'">Pause</button>
                     @endif
                 </div>
                 @if ($project->images->count() > 1)

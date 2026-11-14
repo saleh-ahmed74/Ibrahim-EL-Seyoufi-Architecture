@@ -21,12 +21,14 @@ class Login extends Component
     {
         if (auth()->user()?->is_admin) {
             $this->redirectRoute('admin.dashboard');
+
+            return;
         }
 
         if (auth()->check()) {
-            Auth::logout();
-            request()->session()->invalidate();
-            request()->session()->regenerateToken();
+            $this->redirectRoute('home');
+
+            return;
         }
     }
 
