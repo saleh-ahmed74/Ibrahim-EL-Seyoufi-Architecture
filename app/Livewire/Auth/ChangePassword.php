@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Auth;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -17,7 +19,7 @@ class ChangePassword extends Component
 
     public string $passwordConfirmation = '';
 
-    public function changePassword(): void
+    public function changePassword(): mixed
     {
         $validated = $this->validate([
             'currentPassword' => ['required', 'current_password:web'],
@@ -29,7 +31,10 @@ class ChangePassword extends Component
         $sessionId = request()->session()->getId();
 
         DB::transaction(function () use ($user, $validated, $sessionId): void {
-            $user->forceFill(['password' => Hash::make($validated['password'])])->save();
+            $user->forceFill([
+                'password' => Hash::make($validated['password']),
+                'remember_token' => Str::random(60),
+            ])->save();
 
             if (config('session.driver') === 'database') {
                 DB::table(config('session.table'))
@@ -39,9 +44,12 @@ class ChangePassword extends Component
             }
         });
 
-        request()->session()->regenerate();
-        $this->reset();
-        session()->flash('status', 'Password changed. Other active sessions have been signed out.');
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+        session()->flash('status', 'Password changed. Sign in again with your new password.');
+
+        return $this->redirectRoute('login');
     }
 
     public function render()
