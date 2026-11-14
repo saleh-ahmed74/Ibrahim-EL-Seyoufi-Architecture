@@ -32,13 +32,16 @@ class Dashboard extends AdminComponent
             ->map(fn (Project $project): array => ['year' => $project->year, 'count' => $project->count])
             ->all();
 
+        $files = Storage::disk('public')->allFiles();
+
         return view('livewire.admin.dashboard', [
             'totalProjects' => Project::query()->rootProjects()->count(),
             'totalSubprojects' => Project::query()->whereNotNull('parent_id')->count(),
             'totalCategories' => Category::query()->count(),
             'inquiriesCount' => Inquiry::query()->count(),
             'pageViewsCount' => PageView::query()->count(),
-            'storageFiles' => count(Storage::disk('public')->allFiles()),
+            'storageFiles' => count($files),
+            'storageBytes' => collect($files)->sum(fn (string $file): int => Storage::disk('public')->size($file)),
             'projectsByCategory' => $projectsByCategory,
             'projectsByYear' => $projectsByYear,
         ]);
