@@ -25,6 +25,7 @@
             <form method="post" action="{{ route('admin.logout') }}">@csrf<button type="submit">Sign out</button></form>
         </div>
     </header>
+    <div class="network-status" id="network-status" role="status" aria-live="polite" hidden></div>
     <main class="admin-main">
         @if (session('status'))
             <div class="flash-message" role="status">{{ session('status') }}</div>
@@ -32,5 +33,6 @@
         {{ $slot }}
     </main>
     @livewireScripts
+    <script src="{{ asset('offline.js') }}" defer></script>
 </body>
 </html>

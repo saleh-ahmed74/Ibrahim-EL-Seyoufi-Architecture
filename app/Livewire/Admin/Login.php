@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
@@ -15,8 +16,6 @@ class Login extends Component
     public string $email = '';
 
     public string $password = '';
-
-    public bool $remember = true;
 
     public function mount(): void
     {
@@ -34,19 +33,23 @@ class Login extends Component
     public function login(): mixed
     {
         $credentials = $this->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
+            'email' => ['required', 'email', 'max:255'],
+            'password' => ['required', 'string', 'max:1024'],
         ]);
 
         $key = Str::lower($this->email).'|'.request()->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
-            throw ValidationException::withMessages([
-                'email' => 'Too many sign-in attempts. Try again in '.RateLimiter::availableIn($key).' seconds.',
-            ]);
+            $retryAfter = RateLimiter::availableIn($key);
+
+            throw new HttpResponseException(response()->json(
+                ['message' => 'Too many sign-in attempts. Please wait before trying again.'],
+                429,
+                ['Retry-After' => (string) $retryAfter],
+            ));
         }
 
-        if (! Auth::attempt($credentials, $this->remember)) {
+        if (! Auth::attempt($credentials)) {
             RateLimiter::hit($key, 60);
 
             throw ValidationException::withMessages([
@@ -59,7 +62,7 @@ class Login extends Component
             RateLimiter::hit($key, 60);
 
             throw ValidationException::withMessages([
-                'email' => 'This account does not have administrator access.',
+                'email' => 'The provided sign-in details are incorrect.',
             ]);
         }
 

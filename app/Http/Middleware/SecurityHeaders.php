@@ -18,8 +18,8 @@ class SecurityHeaders
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
         $response->headers->set('X-Permitted-Cross-Domain-Policies', 'none');
 
-        if (app()->isProduction() && $request->isSecure()) {
-            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        if (app()->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
+            $response->headers->set('Strict-Transport-Security', 'max-age=31536000');
         }
 
         return $response;

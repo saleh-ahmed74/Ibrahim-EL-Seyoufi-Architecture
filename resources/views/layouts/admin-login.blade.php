@@ -9,7 +9,9 @@
     @livewireStyles
 </head>
 <body class="admin-login-body">
+    <div class="network-status" id="network-status" role="status" aria-live="polite" hidden></div>
     <main class="admin-login-wrap">{{ $slot }}</main>
     @livewireScripts
+    <script src="{{ asset('offline.js') }}" defer></script>
 </body>
 </html>

@@ -8,7 +8,6 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,11 +25,7 @@ class AppServiceProvider extends ServiceProvider
             URL::forceRootUrl(config('app.url'));
         }
 
-        RateLimiter::for('admin-login', function (Request $request): Limit {
-            $identity = Str::lower((string) $request->input('email'));
-
-            return Limit::perMinute(5)->by($identity.'|'.$request->ip());
-        });
+        RateLimiter::for('admin-login', fn (Request $request): Limit => Limit::perMinute(30)->by($request->ip()));
 
         RateLimiter::for('admin', fn (Request $request): Limit => Limit::perMinute(120)->by($request->user()?->id.'|'.$request->ip()));
     }
