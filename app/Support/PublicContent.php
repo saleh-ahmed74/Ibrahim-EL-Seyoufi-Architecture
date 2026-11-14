@@ -51,7 +51,8 @@ class PublicContent
             function () use ($categorySlug, $limit): Collection {
                 $query = Project::query()
                     ->rootProjects()
-                    ->with(['category', 'images', 'coverImage', 'children.images', 'children.coverImage'])
+                    ->withCount('children')
+                    ->with(['category', 'coverImage', 'images' => fn ($images) => $images->limit(1)])
                     ->orderBy('sort_order')
                     ->orderByDesc('year')
                     ->orderBy('id');

@@ -5,6 +5,21 @@
             <article class="admin-stat"><span>{{ $label }}</span><strong>{{ number_format($value) }}</strong></article>
         @endforeach
     </div>
+    <section class="admin-panel dashboard-projects-panel">
+        <header class="dashboard-projects-heading"><div><span class="eyebrow">Portfolio</span><h2>Main projects</h2><p>Open the project manager to edit a project or expand its subprojects.</p></div><a class="button" href="{{ route('admin.projects') }}">Open project manager</a></header>
+        <div class="dashboard-project-list">
+            @forelse($portfolioProjects as $project)
+                @php $dashboardCover = $project->coverImage ?: $project->images->first(); @endphp
+                <a class="dashboard-project-item" href="{{ route('admin.projects') }}">
+                    <span class="dashboard-project-cover">@if($dashboardCover)<img src="{{ $dashboardCover->publicUrl() }}" alt="" loading="lazy">@else<span class="image-placeholder"></span>@endif</span>
+                    <span class="dashboard-project-copy"><strong>{{ $project->title }}</strong><small>{{ $project->category?->name ?: 'Architecture' }}@if($project->location) · {{ $project->location }}@endif @if($project->year) · {{ $project->year }}@endif</small></span>
+                    <span class="project-count-pill">{{ $project->children_count }} {{ $project->children_count === 1 ? 'subproject' : 'subprojects' }}</span><span class="dashboard-project-arrow" aria-hidden="true">↗</span>
+                </a>
+            @empty
+                <p class="empty-state">No projects yet. Open the project manager to add the first one.</p>
+            @endforelse
+        </div>
+    </section>
     <section class="admin-panel">
         <h2>Projects by category</h2>
         @forelse ($projectsByCategory as $row)

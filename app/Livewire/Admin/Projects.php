@@ -55,6 +55,14 @@ class Projects extends AdminComponent
 
     public string $lastSavedSubprojectParent = '';
 
+    public function createSubproject(int $parentId): void
+    {
+        $parent = Project::query()->rootProjects()->findOrFail($parentId);
+        $this->resetForm();
+        $this->parentId = $parent->id;
+        $this->sortOrder = ((int) $parent->children()->max('sort_order')) + 1;
+        $this->dispatch('focus-project-editor');
+    }
     public function updatedParentId(): void
     {
         $this->categoryId = null;
@@ -87,6 +95,7 @@ class Projects extends AdminComponent
         ])->all();
         $this->coverImageId = $project->images->firstWhere('is_cover', true)?->id;
         $this->status = $project->trashed() ? 'archived' : 'active';
+        $this->dispatch('focus-project-editor');
     }
 
     public function save(PublicContent $content): void
@@ -238,11 +247,6 @@ class Projects extends AdminComponent
         Storage::disk('public')->delete($image->image_path);
         $image->delete();
 
-        $this->existingImages = array_values(array_filter(
-            $this->existingImages,
-            fn (array $existing): bool => $existing['id'] !== $imageId,
-        ));
-
         if ($this->coverImageId === $imageId) {
             $this->coverImageId = null;
             $next = $project->images()->oldest('id')->first();
@@ -253,6 +257,13 @@ class Projects extends AdminComponent
             }
         }
 
+        $this->existingImages = $project->images()->get()->map(fn (ProjectImage $image): array => [
+            'id' => $image->id,
+            'url' => $image->publicUrl(),
+            'alt_text' => $image->alt_text,
+            'sort_order' => $image->sort_order,
+            'is_cover' => $image->is_cover,
+        ])->all();
         $content->invalidate();
     }
 
@@ -315,22 +326,28 @@ class Projects extends AdminComponent
         ]);
         $this->sortOrder = 0;
         $this->resetValidation();
+        $this->dispatch('focus-project-editor');
     }
 
     public function render()
     {
         $projects = Project::query()
-            ->with(['category', 'parent.category', 'coverImage', 'children'])
             ->when($this->status === 'archived', fn ($query) => $query->onlyTrashed())
-            ->when($this->status !== 'archived', fn ($query) => $query->whereNull('deleted_at'))
+            ->when($this->status !== 'archived', fn ($query) => $query->rootProjects())
+            ->with($this->status === 'archived'
+                ? ['parent', 'category', 'images', 'coverImage']
+                : ['category', 'images', 'coverImage', 'children.category', 'children.images', 'children.coverImage'])
             ->when($this->search, fn ($query) => $query->where(fn ($query) => $query
                 ->where('title', 'like', '%'.$this->search.'%')
                 ->orWhere('slug', 'like', '%'.$this->search.'%')
-                ->orWhere('location', 'like', '%'.$this->search.'%')))
-            ->orderByRaw('parent_id IS NOT NULL')
-            ->orderBy('sort_order')
-            ->orderByDesc('year')
-            ->paginate(12);
+                ->orWhere('location', 'like', '%'.$this->search.'%')
+                ->when($this->status !== 'archived', fn ($query) => $query->orWhereHas('children', fn ($children) => $children
+                    ->where('title', 'like', '%'.$this->search.'%')
+                    ->orWhere('slug', 'like', '%'.$this->search.'%')
+                    ->orWhere('location', 'like', '%'.$this->search.'%')))))
+            ->when($this->status !== 'archived', fn ($query) => $query->orderBy('sort_order')->orderByDesc('year'))
+            ->orderBy('id')
+            ->paginate($this->status === 'archived' ? 12 : 9);
 
         return view('livewire.admin.projects', [
             'projects' => $projects,

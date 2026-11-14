@@ -6,8 +6,8 @@
         @else
             <div class="image-placeholder" aria-hidden="true"></div>
         @endif
-        @if ($project->children->isNotEmpty())
-            <span class="subproject-count">{{ $project->children->count() }} internal projects</span>
+        @if (($project->children_count ?? 0) > 0)
+            <span class="subproject-count">{{ $project->children_count }} internal projects</span>
         @endif
     </div>
     <div class="project-meta">
