@@ -18,6 +18,8 @@ class Categories extends AdminComponent
 {
     use WithFileUploads, WithPagination;
 
+    protected string $paginationTheme = 'bootstrap';
+
     public string $search = '';
 
     public ?int $editingId = null;
@@ -96,7 +98,11 @@ class Categories extends AdminComponent
                 Storage::disk('public')->delete($storedPath);
             }
 
-            throw $exception;
+            report($exception);
+            $this->addError('database', 'The category could not be saved. Check the database and try again.');
+            $this->notifyAdmin('Could not save the category. Check the database and try again.', 'error');
+
+            return;
         }
 
         if ($storedPath && $oldPath) {
@@ -105,7 +111,7 @@ class Categories extends AdminComponent
 
         $content->invalidate();
         $this->resetForm();
-        session()->flash('status', 'Category saved.');
+        $this->notifyAdmin('Category saved.');
     }
 
     public function delete(int $id, PublicContent $content): void
@@ -119,7 +125,7 @@ class Categories extends AdminComponent
         }
 
         $content->invalidate();
-        session()->flash('status', 'Category deleted. Projects remain available without a category.');
+        $this->notifyAdmin('Category deleted. Projects remain available without a category.');
     }
 
     public function resetForm(): void

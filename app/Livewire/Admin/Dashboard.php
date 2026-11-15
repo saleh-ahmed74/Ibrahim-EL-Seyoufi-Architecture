@@ -16,6 +16,8 @@ class Dashboard extends AdminComponent
 {
     use WithPagination;
 
+    protected string $paginationTheme = 'bootstrap';
+
     public string $categoryFilter = '';
 
     public string $yearFilter = '';

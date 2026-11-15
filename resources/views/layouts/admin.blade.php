@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" dir="ltr" data-theme="dark">
+<html lang="en" dir="ltr" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -34,15 +34,15 @@
             <header class="admin-topbar">
                 <button class="admin-menu-toggle" type="button" aria-label="Open administration menu" x-on:click="menuOpen = !menuOpen" x-bind:aria-expanded="menuOpen.toString()">☰</button>
                 <span>{{ $title ?? 'Portfolio administration' }}</span>
+                <button class="admin-theme-toggle" type="button" data-theme-toggle data-theme-storage="admin_theme_v2" data-theme-default="light" data-light-label="Dark mode" data-dark-label="Light mode" aria-label="Change administrator color mode">Dark mode</button>
             </header>
             <div class="network-status" id="network-status" role="status" aria-live="polite" hidden></div>
-            <main class="admin-main">
-                @if (session('status'))
-                    <div class="flash-message" role="status">{{ session('status') }}</div>
-                @endif
-                {{ $slot }}
-            </main>
+            <main class="admin-main">{{ $slot }}</main>
         </div>
+    </div>
+    <div class="admin-feedback" x-data="{ open: Boolean(@js(session('status'))), message: @js(session('status') ?? ''), type: 'success', timer: null, show(detail) { this.message = detail.message; this.type = detail.type || 'success'; this.open = true; clearTimeout(this.timer); this.timer = setTimeout(() => this.open = false, 5000); }, dismiss() { this.open = false; clearTimeout(this.timer); } }" x-init="if (open) timer = setTimeout(() => open = false, 5000)" x-on:admin-action-feedback.window="show($event.detail)" x-show="open" x-transition.opacity role="status" aria-live="polite" x-bind:class="'is-' + type" x-cloak>
+        <span x-text="message"></span>
+        <button type="button" x-on:click="dismiss()" aria-label="Close notification">×</button>
     </div>
     @livewireScripts
     <script src="{{ asset('offline.js') }}" defer></script>

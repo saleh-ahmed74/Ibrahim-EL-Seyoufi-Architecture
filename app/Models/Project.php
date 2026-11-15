@@ -13,14 +13,16 @@ class Project extends Model
 {
     use SoftDeletes;
 
+    protected $attributes = ['is_featured' => false];
+
     protected $fillable = [
         'category_id', 'parent_id', 'title', 'slug', 'description',
-        'location', 'year', 'sort_order',
+        'location', 'year', 'sort_order', 'is_featured',
     ];
 
     protected function casts(): array
     {
-        return ['year' => 'integer', 'sort_order' => 'integer'];
+        return ['year' => 'integer', 'sort_order' => 'integer', 'is_featured' => 'boolean'];
     }
 
     public function category(): BelongsTo

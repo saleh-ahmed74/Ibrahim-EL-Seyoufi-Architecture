@@ -5,9 +5,14 @@ namespace App\Livewire\Site;
 use App\Support\PublicContent;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ProjectsPage extends Component
 {
+    use WithPagination;
+
+    protected string $paginationTheme = 'bootstrap';
+
     #[Url(as: 'category')]
     public string $category = '';
 
@@ -18,8 +23,7 @@ class ProjectsPage extends Component
 
         return view('livewire.site.projects-page', [
             'settings' => $settings,
-            'categories' => $content->categories(),
-            'projects' => $content->projects($this->category ?: null, 0),
+            'projects' => $content->projectsPage($this->category ?: null, 24, $this->getPage()),
         ])->layout('layouts.public', [
             'settings' => $settings,
             'pageTitle' => 'Projects · '.$settings->site_name,
@@ -27,8 +31,4 @@ class ProjectsPage extends Component
         ]);
     }
 
-    public function filterByCategory(string $slug): void
-    {
-        $this->category = $slug;
-    }
 }

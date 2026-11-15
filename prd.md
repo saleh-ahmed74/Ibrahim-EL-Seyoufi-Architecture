@@ -32,7 +32,7 @@ Goals:
 
 - A slim, uploaded logo stays centered in a sticky header. The navigation menu sits on the left beside the studio name and contains page links, account access, language, and color mode.
 - The home image occupies about two thirds of a mobile viewport, with the portfolio introduction overlaid.
-- The home page lists main projects and filters them with a horizontal row of clickable category image tiles. Each category can have its own cover image.
+- The home page lists only main projects explicitly marked as featured and filters those projects with a horizontal row of clickable category image tiles. No project is featured by default. Each category can have its own cover image.
 - A main project may contain any number of internal projects. Its detail page uses a full-bleed gallery behind the title and introduction, then presents image-led subproject cards with consistent image ratios. The gallery advances every second, with manual controls and a pause option.
 - A project without internal projects continues to show its own image gallery, which also advances every second.
 - Existing project, category, biography, social, contact, language, and theme content remains available.
@@ -42,6 +42,7 @@ Goals:
 - Administrator sign-in is available at /admin/login. Public account sign-in, sign-up, email verification, password recovery, and password change are available from the public navigation.
 - Public sign-up creates non-admin users. Only a trusted administrator command can grant admin access.
 - Administrators can create, edit, archive, restore, and permanently delete projects.
+- Administrators can mark main projects as featured for the homepage; the control is off for new projects and subprojects.
 - Project forms can attach a project to a main project, upload a description and gallery, and select a cover image. A saved subproject prompts the administrator to add another under the same parent. Subprojects inherit the parent category.
 - Administrators can manage category names, images, and visibility, and update site copy, logo, home image, profile photo, social links, contact details, and search metadata.
 - Existing inquiries and analytics remain readable from the admin area.
@@ -56,6 +57,7 @@ Goals:
 | FR-4 | Rotate internal-project images automatically. | The detail-page gallery advances every second when motion is allowed, pauses on request and while focused or hovered, and has manual controls. |
 | FR-5 | Provide homepage brand controls. | The admin can upload a logo and home image; the logo is slim and centered in a sticky header, and the mobile home image uses roughly two thirds of the viewport height. |
 | FR-6 | Preserve content-management workflows. | Admins can manage projects, archived projects, images, categories, site settings, inquiries, and analytics without Filament. |
+| FR-13 | Select homepage projects. | A main project is absent from homepage project highlights by default and appears only when an administrator explicitly marks it as featured; the full projects page continues to list all projects. |
 | FR-7 | Secure admin operations. | Login is rate-limited; only admin accounts can open admin pages or call their Livewire actions; existing administrator access is retained during migration. |
 | FR-8 | Handle images safely. | Uploads are validated, resized, converted to WebP, stored on the public disk, and never accept executable files. |
 | FR-9 | Handle network interruption gracefully. | Public assets and a bounded number of previously opened public pages can be served from cache; admin pages, Livewire requests, uploads, and form submissions are never cached. Offline visitors receive a clear message and manual refresh action. |

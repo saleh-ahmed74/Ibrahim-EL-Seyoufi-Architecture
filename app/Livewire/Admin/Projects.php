@@ -22,6 +22,8 @@ class Projects extends AdminComponent
 {
     use WithFileUploads, WithPagination;
 
+    protected string $paginationTheme = 'bootstrap';
+
     #[Url]
     public string $search = '';
 
@@ -43,11 +45,11 @@ class Projects extends AdminComponent
 
     public ?int $year = null;
 
+    public bool $isFeatured = false;
+
     public int $sortOrder = 0;
 
     public array $imageUploads = [];
-
-    public array $existingImages = [];
 
     public ?int $coverImageId = null;
 
@@ -68,6 +70,9 @@ class Projects extends AdminComponent
     public function updatedParentId(): void
     {
         $this->categoryId = null;
+        if ($this->parentId !== null) {
+            $this->isFeatured = false;
+        }
         $this->resetValidation('categoryId');
     }
     public function updatedSearch(): void
@@ -75,9 +80,14 @@ class Projects extends AdminComponent
         $this->resetPage();
     }
 
+    public function updatedStatus(): void
+    {
+        $this->resetPage();
+    }
+
     public function edit(int $id): void
     {
-        $project = Project::query()->withTrashed()->with(['images'])->findOrFail($id);
+        $project = Project::query()->withTrashed()->findOrFail($id);
 
         $this->editingId = $project->id;
         $this->categoryId = $project->category_id;
@@ -87,16 +97,11 @@ class Projects extends AdminComponent
         $this->description = $project->description;
         $this->location = $project->location ?? '';
         $this->year = $project->year;
+        $this->isFeatured = (bool) $project->is_featured;
         $this->sortOrder = $project->sort_order;
-        $this->existingImages = $project->images->map(fn (ProjectImage $image): array => [
-            'id' => $image->id,
-            'url' => $image->publicUrl(),
-            'alt_text' => $image->alt_text,
-            'sort_order' => $image->sort_order,
-            'is_cover' => $image->is_cover,
-        ])->all();
-        $this->coverImageId = $project->images->firstWhere('is_cover', true)?->id;
+        $this->coverImageId = $project->images()->where('is_cover', true)->value('id');
         $this->status = $project->trashed() ? 'archived' : 'active';
+        $this->resetPage('editor-images-page');
         $this->dispatch('focus-project-editor');
     }
 
@@ -117,8 +122,9 @@ class Projects extends AdminComponent
             'description' => ['required', 'string', 'max:20000'],
             'location' => ['nullable', 'string', 'max:255'],
             'year' => ['nullable', 'integer', 'min:1800', 'max:2200'],
+            'isFeatured' => ['required', 'boolean'],
             'sortOrder' => ['required', 'integer', 'min:0', 'max:65535'],
-            'imageUploads' => $this->editingId || $this->existingImages ? ['array', 'max:20'] : ['required', 'array', 'min:1', 'max:20'],
+            'imageUploads' => $this->editingId ? ['array', 'max:20'] : ['required', 'array', 'min:1', 'max:20'],
             'imageUploads.*' => ['image', 'mimes:jpeg,jpg,png,webp', 'max:8192'],
             'coverUploadIndex' => ['nullable', 'integer', 'min:0'],
         ]);
@@ -154,6 +160,7 @@ class Projects extends AdminComponent
                     'location' => $validated['location'] ?: null,
                     'year' => $validated['year'] ?: null,
                     'sort_order' => $validated['sortOrder'],
+                    'is_featured' => $validated['parentId'] === null && $validated['isFeatured'],
                 ],
             );
 
@@ -171,7 +178,7 @@ class Projects extends AdminComponent
                 $path = ImageCompressor::store($imageUpload, 'public', 'projects', 1920, 75);
                 $storedPaths[] = $path;
                 $isCover = $this->coverUploadIndex === $index
-                    || ($this->coverImageId === null && $this->existingImages === [] && $index === 0);
+                    || ($this->coverImageId === null && $index === 0);
 
                 if ($isCover) {
                     $project->images()->update(['is_cover' => false]);
@@ -200,8 +207,11 @@ class Projects extends AdminComponent
             });
         } catch (\Throwable $exception) {
             Storage::disk('public')->delete($storedPaths);
+            report($exception);
+            $this->addError('database', 'The project could not be saved. Check the database and try again.');
+            $this->notifyAdmin('Could not save the project. Check the database and try again.', 'error');
 
-            throw $exception;
+            return;
         }
 
         $content->invalidate();
@@ -212,12 +222,12 @@ class Projects extends AdminComponent
             $this->sortOrder = ((int) Project::query()->where('parent_id', $savedParentId)->max('sort_order')) + 1;
             $this->lastSavedSubprojectParent = $savedParentTitle;
             $this->askAddAnotherSubproject = true;
-            session()->flash('status', 'Subproject saved.');
+            $this->notifyAdmin('Subproject saved.');
 
             return;
         }
 
-        session()->flash('status', 'Project saved.');
+        $this->notifyAdmin('Project saved.');
     }
 
     public function setCover(int $imageId, PublicContent $content): void
@@ -232,13 +242,8 @@ class Projects extends AdminComponent
 
         $this->coverImageId = $imageId;
         $content->invalidate();
-        $this->existingImages = $project->images()->get()->map(fn (ProjectImage $image): array => [
-            'id' => $image->id,
-            'url' => $image->publicUrl(),
-            'alt_text' => $image->alt_text,
-            'sort_order' => $image->sort_order,
-            'is_cover' => $image->is_cover,
-        ])->all();
+        $this->resetPage('editor-images-page');
+        $this->notifyAdmin('Project cover image updated.');
     }
 
     public function removeImage(int $imageId, PublicContent $content): void
@@ -259,28 +264,23 @@ class Projects extends AdminComponent
             }
         }
 
-        $this->existingImages = $project->images()->get()->map(fn (ProjectImage $image): array => [
-            'id' => $image->id,
-            'url' => $image->publicUrl(),
-            'alt_text' => $image->alt_text,
-            'sort_order' => $image->sort_order,
-            'is_cover' => $image->is_cover,
-        ])->all();
+        $this->resetPage('editor-images-page');
         $content->invalidate();
+        $this->notifyAdmin('Project image removed.');
     }
 
     public function archive(int $id, PublicContent $content): void
     {
         Project::query()->findOrFail($id)->delete();
         $content->invalidate();
-        session()->flash('status', 'Project archived and hidden from the public website.');
+        $this->notifyAdmin('Project archived and hidden from the public website.');
     }
 
     public function restore(int $id, PublicContent $content): void
     {
         Project::query()->onlyTrashed()->findOrFail($id)->restore();
         $content->invalidate();
-        session()->flash('status', 'Project restored.');
+        $this->notifyAdmin('Project restored.');
     }
 
     public function forceDelete(int $id, PublicContent $content): void
@@ -306,7 +306,7 @@ class Projects extends AdminComponent
         });
 
         $content->invalidate();
-        session()->flash('status', 'Archived project and its subprojects permanently deleted.');
+        $this->notifyAdmin('Archived project and its subprojects permanently deleted.');
     }
 
     public function continueAddingSubproject(): void
@@ -323,11 +323,12 @@ class Projects extends AdminComponent
     {
         $this->reset([
             'editingId', 'categoryId', 'parentId', 'title', 'slug', 'description',
-            'location', 'year', 'imageUploads', 'existingImages', 'coverImageId', 'coverUploadIndex',
+            'location', 'year', 'isFeatured', 'imageUploads', 'coverImageId', 'coverUploadIndex',
             'askAddAnotherSubproject', 'lastSavedSubprojectParent',
         ]);
         $this->sortOrder = 0;
         $this->resetValidation();
+        $this->resetPage('editor-images-page');
         $this->dispatch('focus-project-editor');
     }
 
@@ -337,8 +338,13 @@ class Projects extends AdminComponent
             ->when($this->status === 'archived', fn ($query) => $query->onlyTrashed())
             ->when($this->status !== 'archived', fn ($query) => $query->rootProjects())
             ->with($this->status === 'archived'
-                ? ['parent', 'category', 'images', 'coverImage']
-                : ['category', 'images', 'coverImage', 'children.category', 'children.images', 'children.coverImage'])
+                ? ['parent', 'category', 'coverImage', 'images' => fn ($images) => $images->limit(1)]
+                : [
+                    'category',
+                    'coverImage',
+                    'images' => fn ($images) => $images->limit(1),
+                ])
+            ->withCount('children')
             ->when($this->search, fn ($query) => $query->where(fn ($query) => $query
                 ->where('title', 'like', '%'.$this->search.'%')
                 ->orWhere('slug', 'like', '%'.$this->search.'%')
@@ -351,8 +357,22 @@ class Projects extends AdminComponent
             ->orderBy('id')
             ->paginate($this->status === 'archived' ? 12 : 9);
 
+        if ($this->status !== 'archived') {
+            $projects->getCollection()->each(function (Project $project): void {
+                $project->setRelation('paginatedChildren', $project->children()
+                    ->with(['category', 'coverImage', 'images' => fn ($images) => $images->limit(1)])
+                    ->withCount('images')
+                    ->paginate(8, ['*'], 'subprojects-'.$project->id));
+            });
+        }
+
+        $editorImages = $this->editingId
+            ? Project::query()->withTrashed()->find($this->editingId)?->images()->paginate(12, ['*'], 'editor-images-page')
+            : null;
+
         return view('livewire.admin.projects', [
             'projects' => $projects,
+            'editorImages' => $editorImages,
             'categories' => Category::query()->orderBy('sort_order')->get(),
             'selectedParent' => $this->parentId ? Project::query()->with('category')->find($this->parentId) : null,
             'parentProjects' => Project::query()

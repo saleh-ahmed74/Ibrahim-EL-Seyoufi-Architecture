@@ -13,8 +13,13 @@ class SiteSetting extends Model
         'phone', 'email', 'whatsapp_number', 'whatsapp_message', 'address',
         'instagram_url', 'facebook_url', 'linkedin_url', 'youtube_url',
         'pinterest_url', 'profile_image', 'hero_image', 'logo_path',
-        'meta_title', 'meta_description',
+        'meta_title', 'meta_description', 'homepage_copy',
     ];
+
+    protected function casts(): array
+    {
+        return ['homepage_copy' => 'array'];
+    }
 
     public function publicImageUrl(?string $path): ?string
     {

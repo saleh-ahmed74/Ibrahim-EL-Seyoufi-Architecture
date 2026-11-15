@@ -12,6 +12,8 @@ class Inquiries extends AdminComponent
 {
     use WithPagination;
 
+    protected string $paginationTheme = 'bootstrap';
+
     public string $search = '';
 
     public function updatedSearch(): void
@@ -22,7 +24,7 @@ class Inquiries extends AdminComponent
     public function delete(int $id): void
     {
         Inquiry::query()->findOrFail($id)->delete();
-        session()->flash('status', 'Inquiry deleted.');
+        $this->notifyAdmin('Inquiry deleted.');
     }
 
     public function render()

@@ -2,6 +2,7 @@
     <div class="admin-page-heading"><div><span class="eyebrow">Organization</span><h1>Categories</h1><p>Give every category a clear name and cover image. These images appear as visual filters on the homepage.</p></div></div>
     <div class="admin-columns">
         <form class="admin-panel admin-form category-editor" wire:submit="save" enctype="multipart/form-data">
+            @error('database')<div class="field-error" role="alert">{{ $message }}</div>@enderror
             <header><span class="eyebrow">Portfolio taxonomy</span><h2>{{ $editingId ? 'Edit category' : 'New category' }}</h2></header>
             <div class="admin-field"><label for="category-name">Name <span>*</span></label><input id="category-name" wire:model="name" required placeholder="Residential"><small>Use the name visitors will recognize.</small>@error('name')<span class="field-error" role="alert">{{ $message }}</span>@enderror</div>
             <div class="admin-field"><label for="category-slug">Page address</label><input id="category-slug" wire:model="slug" placeholder="Created from the name">@error('slug')<span class="field-error" role="alert">{{ $message }}</span>@enderror</div>

@@ -3,27 +3,18 @@
 namespace App\Livewire\Site;
 
 use App\Support\PublicContent;
-use Livewire\Attributes\Url;
+use App\Support\HomepageCopy;
 use Livewire\Component;
 
 class HomePage extends Component
 {
-    #[Url(as: 'category')]
-    public string $category = '';
-
     public function render()
     {
         $content = app(PublicContent::class);
         $settings = $content->settings();
-        $projects = $content->projects($this->category ?: null, 6);
+        $homepageCopy = HomepageCopy::merge($settings->homepage_copy);
+        $projects = $content->projects(null, 6, featuredOnly: true);
         $heroSlides = collect();
-
-        if ($settings->hero_image) {
-            $heroSlides->push([
-                'url' => $settings->publicImageUrl($settings->hero_image),
-                'alt' => $settings->site_name,
-            ]);
-        }
 
         foreach ($projects as $project) {
             $cover = $project->coverImage ?: $project->images->first();
@@ -38,18 +29,16 @@ class HomePage extends Component
 
         return view('livewire.site.home-page', [
             'settings' => $settings,
-            'categories' => $content->categories(),
+            'homepageCopy' => $homepageCopy,
             'projects' => $projects,
             'heroSlides' => $heroSlides->unique('url')->values(),
+            'heroPortrait' => $settings->hero_image ? $settings->publicImageUrl($settings->hero_image) : null,
         ])->layout('layouts.public', [
             'settings' => $settings,
+            'homepageCopy' => $homepageCopy,
             'pageTitle' => $settings->meta_title ?: $settings->site_name,
             'metaDescription' => $settings->meta_description ?: $settings->short_bio,
         ]);
     }
 
-    public function filterByCategory(string $slug): void
-    {
-        $this->category = $slug;
-    }
 }

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Project;
 use App\Models\SiteSetting;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Throwable;
@@ -32,25 +33,58 @@ class PublicContent
     }
 
     /** @return Collection<int, Category> */
-    public function categories(): Collection
+    public function categories(bool $featuredOnly = false): Collection
+    {
+        $cacheKey = $featuredOnly ? 'categories.featured' : 'categories';
+
+        return $this->remember(
+            $cacheKey,
+            fn () => Category::query()
+                ->where('is_active', true)
+                ->when($featuredOnly, fn ($query) => $query->whereHas('projects', fn ($projects) => $projects->rootProjects()->where('is_featured', true)))
+                ->withCount(['projects as main_projects_count' => fn ($query) => $query
+                    ->whereNull('parent_id')
+                    ->when($featuredOnly, fn ($projects) => $projects->where('is_featured', true))])
+                ->with([
+                    'projects' => fn ($query) => $query->rootProjects()
+                        ->when($featuredOnly, fn ($projects) => $projects->where('is_featured', true))
+                        ->with('coverImage')
+                        ->with(['images' => fn ($images) => $images->limit(1)])
+                        ->orderBy('sort_order'),
+                ])
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(),
+            new Collection(),
+        );
+    }
+
+    /** @return Collection<int, Category> */
+    public function categoryMenu(): Collection
     {
         return $this->remember(
-            'categories',
-            fn () => Category::query()->where('is_active', true)->withCount(['projects as main_projects_count' => fn ($query) => $query->whereNull('parent_id')])->with(['projects' => fn ($query) => $query->rootProjects()->with(['coverImage', 'images'])->orderBy('sort_order')])->orderBy('sort_order')->orderBy('name')->get(),
+            'categories.menu',
+            fn () => Category::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(['id', 'name', 'slug']),
             new Collection(),
         );
     }
 
     /** @return Collection<int, Project> */
-    public function projects(?string $categorySlug = null, int $limit = 24): Collection
+    public function projects(?string $categorySlug = null, int $limit = 24, bool $featuredOnly = false): Collection
     {
         $categoryKey = $categorySlug ?: 'all';
+        $featuredKey = $featuredOnly ? '.featured' : '';
 
         return $this->remember(
-            "projects.{$categoryKey}.{$limit}",
-            function () use ($categorySlug, $limit): Collection {
+            "projects.{$categoryKey}.{$limit}{$featuredKey}",
+            function () use ($categorySlug, $limit, $featuredOnly): Collection {
                 $query = Project::query()
                     ->rootProjects()
+                    ->when($featuredOnly, fn ($projects) => $projects->where('is_featured', true))
                     ->withCount('children')
                     ->with(['category', 'coverImage', 'images' => fn ($images) => $images->limit(1)])
                     ->orderBy('sort_order')
@@ -71,6 +105,35 @@ class PublicContent
         );
     }
 
+    /** @return LengthAwarePaginator<int, Project> */
+    public function projectsPage(?string $categorySlug = null, int $perPage = 24, int $page = 1): LengthAwarePaginator
+    {
+        $categoryKey = $categorySlug ?: 'all';
+
+        return $this->remember(
+            "projects-page.{$categoryKey}.{$perPage}.{$page}",
+            function () use ($categorySlug, $perPage, $page): LengthAwarePaginator {
+                $query = Project::query()
+                    ->rootProjects()
+                    ->withCount('children')
+                    ->with(['category', 'coverImage', 'images' => fn ($images) => $images->limit(1)])
+                    ->orderBy('sort_order')
+                    ->orderByDesc('year')
+                    ->orderBy('id');
+
+                if ($categorySlug) {
+                    $query->whereHas('category', fn ($category) => $category->where('slug', $categorySlug)->where('is_active', true));
+                }
+
+                return $query->paginate($perPage, ['*'], 'page', $page);
+            },
+            new LengthAwarePaginator([], 0, $perPage, $page, [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]),
+        );
+    }
+
     public function project(string $slug): ?Project
     {
         return $this->remember(
@@ -78,17 +141,40 @@ class PublicContent
             fn () => Project::query()
                 ->where('slug', $slug)
                 ->where(fn ($query) => $query->whereNull('parent_id')->orWhereHas('parent'))
-                ->with([
-                    'category',
-                    'parent.category',
-                    'images',
-                    'coverImage',
-                    'children.category',
-                    'children.images',
-                    'children.coverImage',
-                ])
+                ->with(['category', 'parent.category'])
+                ->withCount(['children', 'images'])
                 ->first(),
             null,
+        );
+    }
+
+    /** @return LengthAwarePaginator<int, Project> */
+    public function projectChildrenPage(int $projectId, int $perPage = 12, int $page = 1): LengthAwarePaginator
+    {
+        return $this->remember(
+            "project-children-page.{$projectId}.{$perPage}.{$page}",
+            fn () => Project::query()
+                ->where('parent_id', $projectId)
+                ->with(['category', 'coverImage', 'images' => fn ($images) => $images->limit(1)])
+                ->withCount('images')
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->paginate($perPage, ['*'], 'subprojects_page', $page),
+            $this->emptyPaginator($perPage, $page),
+        );
+    }
+
+    /** @return LengthAwarePaginator<int, \App\Models\ProjectImage> */
+    public function projectImagesPage(int $projectId, int $perPage = 12, int $page = 1): LengthAwarePaginator
+    {
+        return $this->remember(
+            "project-images-page.{$projectId}.{$perPage}.{$page}",
+            fn () => \App\Models\ProjectImage::query()
+                ->where('project_id', $projectId)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->paginate($perPage, ['*'], 'gallery_page', $page),
+            $this->emptyPaginator($perPage, $page),
         );
     }
 
@@ -106,6 +192,10 @@ class PublicContent
             $version = Cache::get('public-content-version', '1');
             $cacheKey = 'public-content.'.$version.'.'.$key;
             $stale = Cache::get($cacheKey);
+
+            if ($stale !== null) {
+                return $stale;
+            }
         } catch (Throwable) {
             $cacheKey = null;
             $stale = null;
@@ -127,5 +217,13 @@ class PublicContent
 
             return $stale ?? $fallback;
         }
+    }
+
+    private function emptyPaginator(int $perPage, int $page): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([], 0, $perPage, $page, [
+            'path' => request()->url(),
+            'query' => request()->query(),
+        ]);
     }
 }
