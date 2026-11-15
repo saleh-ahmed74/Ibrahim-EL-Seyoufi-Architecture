@@ -1136,3 +1136,6 @@ h2 {
 [data-theme=dark] .dashboard-project-filters select,[data-theme=dark] .dashboard-project-filters input{border-color:#393936;background:#20201e;color:#efeee9}
 @media(max-width:1050px){.dashboard-project-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-project-search{grid-column:1/-1}.dashboard-filter-clear{justify-self:start}}
 @media(max-width:620px){.site-nav .site-brand.has-name{max-width:clamp(50px,calc(100vw - 270px),90px)}.site-nav .site-brand.has-name .wordmark{font-size:.68rem}.all-projects-button{min-height:39px;padding-inline:10px;font-size:.68rem}.all-projects-button>span:last-child{width:18px;height:18px}.dashboard-project-filters{grid-template-columns:1fr 1fr;gap:8px;padding:10px}.dashboard-project-filters select,.dashboard-project-filters input{height:38px;padding-inline:8px;font-size:.68rem}.dashboard-project-search{grid-column:1/-1}.dashboard-filter-clear{height:36px}.dashboard-projects-heading .button{width:auto}}
+
+#project-editor{scroll-margin-top:96px}
+#project-editor:focus{outline:2px solid color-mix(in srgb,var(--accent) 48%,transparent);outline-offset:3px}

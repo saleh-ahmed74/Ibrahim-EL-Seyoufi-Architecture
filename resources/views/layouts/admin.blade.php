@@ -10,7 +10,7 @@
     @livewireStyles
 </head>
 <body class="admin-body">
-    <div class="admin-shell" x-data="{ menuOpen: false }" x-on:keydown.escape.window="menuOpen = false" x-on:focus-project-editor.window="$nextTick(() => { $refs.projectEditor?.scrollIntoView({behavior: 'smooth', block: 'start'}); $refs.projectEditor?.querySelector('#project-title')?.focus({preventScroll: true}) })">
+    <div class="admin-shell" x-data="{ menuOpen: false }" x-on:keydown.escape.window="menuOpen = false">
         <aside class="admin-sidebar" x-bind:class="menuOpen ? 'is-open' : ''">
             <a class="admin-brand" href="{{ route('admin.dashboard') }}">Portfolio Admin</a>
             <span class="admin-sidebar-label">Manage portfolio</span>

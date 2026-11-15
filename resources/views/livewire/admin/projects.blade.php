@@ -1,11 +1,11 @@
-<section class="admin-page project-manager-page">
+<section class="admin-page project-manager-page" x-data="{}" x-on:focus-project-editor.window="$nextTick(() => { const editor = $el.querySelector('#project-editor'); editor?.scrollIntoView({behavior: 'smooth', block: 'center'}); editor?.querySelector('#project-title')?.focus({preventScroll: true}) })">
     <div class="admin-page-heading project-manager-heading">
         <div><span class="eyebrow">Portfolio content</span><h1>Projects &amp; subprojects</h1><p>Each main project contains its own subprojects. Open a project below to view or manage its subprojects.</p></div>
         <button class="button" type="button" wire:click="resetForm">＋ New main project</button>
     </div>
 
     <div class="project-admin-grid">
-        <form class="admin-panel admin-form project-editor" wire:submit="save" enctype="multipart/form-data" x-ref="projectEditor">
+        <form id="project-editor" class="admin-panel admin-form project-editor" wire:submit="save" enctype="multipart/form-data" tabindex="-1">
             <header class="project-editor-heading">
                 <span class="eyebrow">{{ $parentId ? 'Project inside a main project' : 'Portfolio entry' }}</span>
                 <h2>{{ $editingId ? 'Edit project' : ($parentId ? 'Add subproject' : 'Add main project') }}</h2>
