@@ -1170,9 +1170,9 @@ h2 {
 .settings-current-image .danger-link{width:auto;min-height:36px;padding:6px 0;border:0;background:transparent;cursor:pointer}
 
 .home-page .home-hero-person{position:absolute;z-index:0;inset:0;width:100%;height:100%;max-width:none;margin:auto;transform:none;object-fit:contain;object-position:center center;opacity:.84;pointer-events:none;filter:drop-shadow(0 10px 24px #0007)}
-.home-page .hero-copy h1{font-size:clamp(3.4rem,9vw,8rem);font-weight:600;color:#fff;text-shadow:0 3px 22px #000d,-1px 0 #ffffff50,1px 0 #ffffff50}
+.home-page .hero-copy h1{font-size:clamp(2.8rem,6.2vw,6rem);font-weight:600;color:#fff;text-shadow:0 3px 22px #000d,-1px 0 #ffffff50,1px 0 #ffffff50}
 .home-page .home-hero-brand{right:clamp(8px,1vw,18px)}
-@media(max-width:620px){.home-page .home-hero-person{inset:0;width:100%;height:100%;max-width:none;margin:auto;transform:none;object-fit:contain;object-position:center center;opacity:.7}.home-page .hero-copy h1{font-size:clamp(2.7rem,12.5vw,4.5rem);text-shadow:0 3px 18px #000e,-1px 0 #ffffff60,1px 0 #ffffff60}.home-page .home-hero-brand{right:8px}}
+@media(max-width:620px){.home-page .home-hero-person{inset:0;width:100%;height:100%;max-width:none;margin:auto;transform:none;object-fit:contain;object-position:center center;opacity:.7}.home-page .hero-copy h1{font-size:clamp(2.1rem,8.5vw,3.25rem);text-shadow:0 3px 18px #000e,-1px 0 #ffffff60,1px 0 #ffffff60}.home-page .home-hero-brand{right:8px}}
 
 /* Keep homepage project cards compact and in rows across screen sizes. */
 .home-projects-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:clamp(12px,1.5vw,20px)}
