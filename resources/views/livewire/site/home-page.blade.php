@@ -19,7 +19,8 @@
     @endif
     <div class="hero-copy">
         <span class="eyebrow" data-en="{{ $homepageCopy['hero_eyebrow']['en'] }}" data-ar="{{ $homepageCopy['hero_eyebrow']['ar'] }}">{{ $homepageCopy['hero_eyebrow']['en'] }}</span>
-        <h1>{{ $settings->architect_name ?: $settings->site_name }}</h1>
+        @php($heroNameParts = preg_split('/\s+/', trim($settings->architect_name ?: $settings->site_name), 2) ?: [])
+        <h1><span>{{ $heroNameParts[0] ?? '' }}</span>@if (! empty($heroNameParts[1])) <span class="hero-name-second">{{ $heroNameParts[1] }}</span>@endif</h1>
         <p class="title">{{ $settings->professional_title }}</p>
         @if ($settings->short_bio)<p class="intro">{{ $settings->short_bio }}</p>@endif
         <div class="cta-row">
