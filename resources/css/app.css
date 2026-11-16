@@ -1218,3 +1218,5 @@ h2 {
 .home-page .hero{justify-content:flex-start;direction:ltr}
 .home-page .hero-copy{direction:ltr}
 :root[dir=rtl] .home-page .hero-copy{direction:rtl}
+
+.home-page .hero-copy h1 span{display:block}
