@@ -1,5 +1,5 @@
-const PAGE_CACHE = 'portfolio-public-pages-v2';
-const ASSET_CACHE = 'portfolio-assets-v2';
+const PAGE_CACHE = 'portfolio-public-pages-v3';
+const ASSET_CACHE = 'portfolio-assets-v3';
 const OFFLINE_PAGE = '/offline.html';
 const PAGE_LIMIT = 20;
 const ASSET_LIMIT = 120;
