@@ -1212,3 +1212,9 @@ h2 {
 
 #project-editor{scroll-margin-top:96px}
 #project-editor:focus{outline:2px solid color-mix(in srgb,var(--accent) 48%,transparent);outline-offset:3px}
+
+
+/* Keep hero text and actions on the physical left in both language directions. */
+.home-page .hero{justify-content:flex-start;direction:ltr}
+.home-page .hero-copy{direction:ltr}
+:root[dir=rtl] .home-page .hero-copy{direction:rtl}
