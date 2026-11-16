@@ -1138,7 +1138,7 @@ h2 {
 @media(max-width:620px){.project-feature-slides img.project-feature-preview{top:0;width:29%;height:100%;filter:blur(4px) brightness(.72);opacity:.82}.project-feature-slides img.project-feature-preview-previous{inset-inline-start:-12%}.project-feature-slides img.project-feature-preview-next{inset-inline-end:-12%}}
 
 /* Keep the hero copy compact while the portrait stays centered over the gallery. */
-.home-page .hero-copy{width:min(48%,680px);max-width:680px;flex:0 1 680px}
+.home-page .hero-copy{width:min(48%,680px);max-width:680px;min-width:0;flex:0 1 48%}
 .home-page .hero-copy h1{max-width:100%;font-size:clamp(3rem,7vw,6.5rem);line-height:.98}
 
 .home-page .home-hero-brand{right:0}
