@@ -77,7 +77,7 @@ class ExampleTest extends TestCase
         $this->assertStringContainsString('وضع عدم الاتصال · الموقع غير متاح', $offlinePage);
         $this->assertStringContainsString('Try again', $offlinePage);
         $this->assertStringContainsString('navigator.onLine', $offlinePage);
-        $this->assertStringContainsString('portfolio-public-pages-v2', $serviceWorker);
+        $this->assertStringContainsString('portfolio-public-pages-v3', $serviceWorker);
     }
 
     public function test_project_detail_view_paginates_subprojects_and_gallery_images(): void
